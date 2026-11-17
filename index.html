@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b3d2e">
-<meta name="description" content="رفيق العمرة — دليلك الذكي خلال رحلة العمرة: المناسك، الأذكار، الأدعية، المزارات، الخرائط ومواقيت الصلاة">
+<meta name="description" content="سعيد عمرة — دليلك الذكي خلال رحلة العمرة: المناسك، الأذكار، الأدعية، المزارات، الخرائط ومواقيت الصلاة">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="رفيق العمرة">
-<title>رفيق العمرة</title>
+<meta name="apple-mobile-web-app-title" content="سعيد عمرة">
+<title>سعيد عمرة</title>
 <style>
 :root{
   --green:#0b3d2e;--green2:#13573f;--green3:#e8f2ec;--gold:#c9a14a;--gold2:#f5ead0;
@@ -94,7 +94,7 @@ ul.clean{padding-right:20px;margin:6px 0}
 </head>
 <body>
 <header>
-  <h1>🕋 رفيق العمرة</h1>
+  <h1>🕋 سعيد عمرة</h1>
   <div class="sub" id="hdrDate"></div>
 </header>
 
@@ -551,7 +551,7 @@ function vMore(){
       <div style="height:8px"></div><button id="sSave">حفظ الإعدادات</button></div>
       <div class="card"><h2>📲 تثبيت التطبيق</h2><p class="muted">على أندرويد: قائمة المتصفح ⋮ ← «تثبيت التطبيق / إضافة إلى الشاشة الرئيسية». على آيفون: زر المشاركة ← «إضافة إلى الشاشة الرئيسية». يعمل بعدها بدون إنترنت.</p>
       <button class="btn goldb sm hidden" id="installBtn">⬇️ تثبيت الآن</button></div>
-      <div class="card"><p class="muted">المحتوى للتعليم العام وفق ما عليه جمهور أهل العلم؛ في المسائل الخاصة اسأل أهل العلم الموثوقين. حساب مواقيت الصلاة تقريبي.</p></div>`;
+      <div class="card"><p class="muted">🔄 التحديث تلقائي عند الاتصال بالإنترنت — الإصدار: <b dir="ltr">${APP_VERSION.startsWith('__')?'تجريبي':APP_VERSION}</b></p><p class="muted">المحتوى للتعليم العام وفق ما عليه جمهور أهل العلم؛ في المسائل الخاصة اسأل أهل العلم الموثوقين. حساب مواقيت الصلاة تقريبي.</p></div>`;
   }
   return `<div class="tabs">${tabs.map(x=>`<button class="${x[0]===t?'on':''}" data-more="${x[0]}">${x[1]}</button>`).join('')}</div>${body}`;
 }
@@ -594,7 +594,21 @@ document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',(
 /* ================== PWA ================== */
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{e.preventDefault(); deferredPrompt=e;});
-if('serviceWorker' in navigator && location.protocol.startsWith('http')){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+const APP_VERSION='__BUILD__';
+/* التحديث التلقائي: يتحقق من وجود نسخة جديدة عند الفتح، وكل ٣٠ دقيقة، وعند العودة للتطبيق */
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){
+  const hadController = !!navigator.serviceWorker.controller; let reloading=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(!hadController || reloading) return; reloading=true;
+    toast('تم تحديث التطبيق ✓'); setTimeout(()=>location.reload(),900);
+  });
+  navigator.serviceWorker.register('sw.js',{updateViaCache:'none'}).then(reg=>{
+    const check=()=>{ if(navigator.onLine) reg.update().catch(()=>{}); };
+    setInterval(check, 30*60*1000);
+    document.addEventListener('visibilitychange',()=>{ if(document.visibilityState==='visible') check(); });
+    window.addEventListener('online', check);
+  }).catch(()=>{});
+}
 
 hdr(); render();
 setInterval(()=>{ if(view==='home' && !document.activeElement.matches('input,textarea,select')) render(); }, 60000);
