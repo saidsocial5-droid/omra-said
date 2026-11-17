@@ -4,13 +4,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0b3d2e">
-<meta name="description" content="سعيد عمرة — دليلك الذكي خلال رحلة العمرة: المناسك، الأذكار، الأدعية، المزارات، الخرائط ومواقيت الصلاة">
+<meta name="description" content="عمرة سعيد — دليلك الذكي خلال رحلة العمرة: المناسك، الأذكار، الأدعية، المزارات، الخرائط ومواقيت الصلاة">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="سعيد عمرة">
-<title>سعيد عمرة</title>
+<meta name="apple-mobile-web-app-title" content="عمرة سعيد">
+<title>عمرة سعيد</title>
 <style>
 :root{
   --green:#0b3d2e;--green2:#13573f;--green3:#e8f2ec;--gold:#c9a14a;--gold2:#f5ead0;
@@ -45,7 +45,7 @@ button,.btn{font-family:inherit;font-size:16px;border:0;border-radius:12px;paddi
 input,select,textarea{font-family:inherit;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%}
 label{font-size:14px;color:var(--muted)}
 nav.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:50;box-shadow:0 -2px 12px rgba(0,0,0,.05)}
-nav.bottom button{background:none;color:var(--muted);flex-direction:column;gap:0;padding:4px 6px;font-size:12px;flex:1}
+nav.bottom button{background:none;color:var(--muted);flex-direction:column;gap:0;padding:4px 2px;font-size:11.5px;flex:1;min-width:0}
 nav.bottom button .ic{font-size:22px;line-height:1.2}
 nav.bottom button.on{color:var(--green);font-weight:700}
 nav.bottom button.on .ic{transform:scale(1.12)}
@@ -76,6 +76,9 @@ ul.clean{padding-right:20px;margin:6px 0}
 .prayer{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid var(--line)}
 .prayer.next{background:var(--gold2);border-radius:10px;padding:8px 10px;font-weight:700}
 .place{display:flex;gap:12px}
+.links{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.links a{font-size:14px;padding:9px 8px}
+.route{border-right:3px dashed var(--gold);padding:2px 14px 2px 0;margin:6px 0}
 .place .em{font-size:30px;flex:0 0 40px;text-align:center}
 .map{width:100%;height:330px;border:0;border-radius:12px;background:var(--green3)}
 .day{border-right:4px solid var(--green3);padding:4px 12px;margin:10px 0}
@@ -94,7 +97,7 @@ ul.clean{padding-right:20px;margin:6px 0}
 </head>
 <body>
 <header>
-  <h1>🕋 سعيد عمرة</h1>
+  <h1>🕋 عمرة سعيد</h1>
   <div class="sub" id="hdrDate"></div>
 </header>
 
@@ -104,6 +107,7 @@ ul.clean{padding-right:20px;margin:6px 0}
   <button data-v="home" class="on"><span class="ic">🏠</span>الرئيسية</button>
   <button data-v="manasik"><span class="ic">🕋</span>المناسك</button>
   <button data-v="adhkar"><span class="ic">📿</span>الأذكار</button>
+  <button data-v="travel"><span class="ic">✈️</span>السفر</button>
   <button data-v="places"><span class="ic">🗺️</span>المزارات</button>
   <button data-v="more"><span class="ic">☰</span>المزيد</button>
 </nav>
@@ -421,12 +425,110 @@ function smartNow(){
   return {next:nextName, mins, tip, city:c.n};
 }
 
+
+/* ================== السفر: حافلات، طيران، فنادق (الانطلاق من أزرو) ================== */
+const AIRPORTS = {
+  FEZ:{n:'مطار فاس سايس', city:'فاس', km:'نحو 80 كم من أزرو (ساعة وربع تقريباً)', route:[
+    ['أزرو ← فاس','طاكسي كبير مباشر من محطة أزرو، أو حافلة CTM / ستيام. المدة نحو ساعة وربع.'],
+    ['فاس ← مطار فاس سايس','طاكسي (حوالي 15 كم من وسط فاس)، أو الحافلة رقم 16 من محطة القطار.']]},
+  CMN:{n:'مطار محمد الخامس — الدار البيضاء', city:'الدار البيضاء', km:'نحو 300 كم من أزرو (4 ساعات تقريباً)', route:[
+    ['أزرو ← مكناس أو فاس','طاكسي كبير (قرابة ساعة).'],
+    ['مكناس/فاس ← مطار محمد الخامس','قطار ONCF إلى الدار البيضاء ثم قطار المطار، أو حافلة CTM / سوبراتور مباشرة إلى الدار البيضاء.']]},
+  RBA:{n:'مطار الرباط سلا', city:'الرباط', km:'نحو 230 كم من أزرو (3 ساعات تقريباً)', route:[
+    ['أزرو ← مكناس','طاكسي كبير (نحو 1 ساعة).'],
+    ['مكناس ← الرباط','قطار ONCF أو حافلة CTM، ثم طاكسي إلى مطار الرباط سلا.']]},
+  RAK:{n:'مطار مراكش المنارة', city:'مراكش', km:'نحو 450 كم من أزرو', route:[
+    ['أزرو ← خنيفرة/بني ملال ← مراكش','حافلة CTM أو ستيام عبر الأطلس، أو القطار عبر الدار البيضاء.']]}
+};
+const DESTS = {JED:'جدة (مطار الملك عبدالعزيز)', MED:'المدينة المنورة (مطار الأمير محمد بن عبدالعزيز)', TIF:'الطائف'};
+const T = Object.assign({from:'CMN', to:'JED', back:'JED', adults:2, out:'', ret:''}, S.get('travel',{}));
+function saveT(){ S.set('travel',T); }
+const addDays=(iso,n)=>{ if(!iso) return ''; const d=new Date(iso+'T00:00:00'); d.setDate(d.getDate()+n); return d.toISOString().slice(0,10); };
+const yymmdd=iso=>iso? iso.slice(2).replace(/-/g,'') : '';
+function stays(){
+  // تواريخ الفنادق مستخرجة تلقائياً من برنامج الرحلة
+  const st=settings.start, tot=+settings.days||15, md=Math.min(tot,+settings.meccaDays||0);
+  if(!st) return null;
+  const a = settings.order==='medina' ? {medina:[st, addDays(st,tot-md)], mecca:[addDays(st,tot-md), addDays(st,tot)]}
+                                      : {mecca:[st, addDays(st,md)], medina:[addDays(st,md), addDays(st,tot)]};
+  return a;
+}
+const L=(href,txt,cls='light')=>`<a class="btn ${cls} sm" target="_blank" rel="noopener" href="${href}">${txt}</a>`;
+let travelTab='flights';
+function vTravel(){
+  if(!T.out && settings.start) T.out=settings.start;
+  if(!T.ret && settings.start) T.ret=addDays(settings.start,(+settings.days||15)-1);
+  const tabs=[['flights','✈️ الطيران'],['bus','🚌 من أزرو للمطار'],['hotels','🏨 الفنادق'],['ksa','🚄 التنقل في السعودية']];
+  let b='';
+  if(travelTab==='flights'){
+    const q=`Flights from ${T.from} to ${T.to} on ${T.out} through ${T.ret}`;
+    const gf=`https://www.google.com/travel/flights?hl=ar&q=${encodeURIComponent(q+' '+T.adults+' adults')}`;
+    const sky=`https://www.skyscanner.net/transport/flights/${T.from.toLowerCase()}/${T.to.toLowerCase()}/${yymmdd(T.out)}/${yymmdd(T.ret)}/?adultsv2=${T.adults}`;
+    const kayak=`https://www.kayak.com/flights/${T.from}-${T.to}/${T.out}/${T.ret}/${T.adults}adults`;
+    b=`<div class="card"><h2>✈️ البحث عن رحلة طيران</h2>
+      <label>مطار الانطلاق</label><select id="tFrom">${Object.entries(AIRPORTS).map(([k,v])=>`<option value="${k}" ${T.from===k?'selected':''}>${v.n} (${k})</option>`).join('')}</select>
+      <p class="muted" style="margin:2px 0 6px">📍 ${AIRPORTS[T.from].km}</p>
+      <label>الوجهة</label><select id="tTo">${Object.entries(DESTS).map(([k,v])=>`<option value="${k}" ${T.to===k?'selected':''}>${v} (${k})</option>`).join('')}</select>
+      <div class="grid2"><div><label>الذهاب</label><input type="date" id="tOut" value="${T.out}"></div><div><label>العودة</label><input type="date" id="tRet" value="${T.ret}"></div></div>
+      <label>عدد المسافرين</label><input type="number" min="1" max="9" id="tAd" value="${T.adults}">
+      <div style="height:8px"></div><button id="tSave" class="btn sm">تحديث البحث</button>
+      ${T.out&&T.ret?`<div class="links">${L(gf,'🔎 Google Flights','')}${L(sky,'🔎 Skyscanner','')}${L(kayak,'🔎 Kayak')}${L('https://www.royalairmaroc.com/ma-ar','الخطوط الملكية المغربية')}${L('https://www.saudia.com/ar-ma','الخطوط السعودية')}${L('https://www.flynas.com/ar','طيران ناس')}</div>`:'<p class="warn" style="margin-top:8px">اختر تاريخي الذهاب والعودة لتظهر نتائج البحث.</p>'}
+      </div>
+      <div class="card"><h3>💡 نصائح للحجز</h3><ul class="clean">
+        <li>الرحلات المباشرة إلى جدة تنطلق غالباً من <b>الدار البيضاء</b>؛ من فاس قد تكون بتوقف — قارن السعر مع كلفة التنقل إلى الدار البيضاء.</li>
+        <li>إن بدأت بالمدينة احجز إلى <b>MED</b> مباشرة وتحرم من ذي الحليفة.</li>
+        <li>الإحرام قبل الإقلاع إن كانت الرحلة إلى جدة (الميقات يُحاذى في الجو).</li>
+        <li>تأكد من وزن الأمتعة المسموح (زمزم يُشحن غالباً في عبوة 5 لترات مختومة).</li>
+        <li>التأشيرة: تأشيرة العمرة أو السياحية عبر المنصات الرسمية (نسك / التأشيرة الإلكترونية) أو وكالة معتمدة.</li></ul></div>`;
+  } else if(travelTab==='bus'){
+    const ap=AIRPORTS[T.from];
+    const dir=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Azrou, Morocco')}&destination=${encodeURIComponent(ap.n)}&travelmode=transit`;
+    b=`<div class="card"><h2>🚌 من أزرو إلى ${ap.n}</h2><p class="muted">غيّر المطار من تبويب «الطيران».</p>
+      ${ap.route.map((r,i)=>`<div class="route"><b>${AR(i+1)}. ${r[0]}</b><div>${r[1]}</div></div>`).join('')}
+      <div class="links">${L(dir,'🧭 المسار على الخريطة','')}${L('https://www.ctm.ma/','حافلات CTM','')}${L('https://www.oncf-voyages.ma/','قطارات ONCF')}${L('https://www.supratours.ma/','سوبراتور')}${L('https://www.markoub.ma/','ماركوب (حجز حافلات)')}</div></div>
+      <div class="card"><h3>⏰ احسب وقت الخروج</h3><label>موعد إقلاع الطائرة</label><input type="time" id="tFly" value="${S.get('flyTime','')}">
+      <div id="tCalc" style="margin-top:8px"></div></div>`;
+  } else if(travelTab==='hotels'){
+    const st=stays(), ad=T.adults;
+    const card=(key,name,q,qen)=>{ const d=st?st[key]:null; const ci=d?d[0]:'', co=d?d[1]:'';
+      const bk=`https://www.booking.com/searchresults.ar.html?ss=${encodeURIComponent(qen)}&group_adults=${ad}&no_rooms=1${ci?`&checkin=${ci}&checkout=${co}`:''}`;
+      const gh=`https://www.google.com/travel/search?hl=ar&q=${encodeURIComponent(q)}${ci?`&checkin=${ci}&checkout=${co}`:''}`;
+      const ag=`https://www.agoda.com/ar-ae/search?textToSearch=${encodeURIComponent(qen)}${ci?`&checkIn=${ci}&los=${Math.max(1,Math.round((new Date(co)-new Date(ci))/864e5))}`:''}&adults=${ad}&rooms=1`;
+      return `<div class="card"><h2>🏨 فنادق ${name}</h2>${ci?`<p class="pill gold">من ${AR(ci)} إلى ${AR(co)}</p>`:'<p class="warn">أدخل تاريخ بداية الرحلة في الإعدادات لتُضبط التواريخ تلقائياً.</p>'}
+      <div class="links">${L(bk,'🔎 Booking','')}${L(gh,'🔎 Google Hotels','')}${L(ag,'🔎 Agoda')}${L('https://www.nusuk.sa/ar','منصة نسك')}</div></div>`; };
+    const order = settings.order==='medina' ? ['medina','mecca'] : ['mecca','medina'];
+    b = order.map(k=> k==='mecca' ? card('mecca','مكة المكرمة','فنادق قريبة من المسجد الحرام','Masjid al-Haram, Mecca') : card('medina','المدينة المنورة','فنادق قريبة من المسجد النبوي','Al Masjid an Nabawi, Medina')).join('')
+      + `<div class="card"><h3>💡 اختيار الفندق</h3><ul class="clean">
+        <li>في مكة: الفنادق المطلّة على الحرم (أبراج البيت، جبل عمر، إبراهيم الخليل) أغلى؛ فندق على بُعد 500–900 م يوفّر كثيراً مع مشي معقول.</li>
+        <li>في المدينة: المنطقة المركزية حول المسجد النبوي تجعل الصلوات الخمس سهلة.</li>
+        <li>اقرأ التقييمات الحديثة، وتحقق من «المسافة الحقيقية مشياً» لا خط الطيران.</li>
+        <li>تأكد من شمول الإفطار، ومن وجود مصعد كافٍ في أوقات الصلاة.</li></ul></div>`;
+  } else {
+    b=`<div class="card"><h2>🚄 التنقل داخل السعودية</h2>
+      <div class="route"><b>قطار الحرمين السريع</b><div>جدة (المطار/السليمانية) ↔ مكة ↔ المدينة. من مكة إلى المدينة نحو ساعتين ونصف.</div></div>
+      <div class="route"><b>حافلات سابتكو</b><div>رحلات بين المدن بأسعار أقل.</div></div>
+      <div class="route"><b>حافلات مكة / المدينة</b><div>حافلات داخلية تربط الأحياء بالحرم.</div></div>
+      <div class="route"><b>تطبيقات التوصيل</b><div>Careem و Uber متاحة في مكة والمدينة وجدة.</div></div>
+      <div class="links">${L('https://sar.hhr.sa/','قطار الحرمين','')}${L('https://www.saptco.com.sa/','سابتكو','')}${L('https://www.careem.com/','Careem')}${L('https://www.uber.com/sa/ar/','Uber')}</div></div>`;
+  }
+  return `<div class="tabs">${tabs.map(x=>`<button class="${x[0]===travelTab?'on':''}" data-tt="${x[0]}">${x[1]}</button>`).join('')}</div>${b}
+   <div class="card"><p class="muted" style="margin:0">ℹ️ الروابط تفتح مواقع الحجز الرسمية بالبحث جاهزاً؛ الأسعار والمواعيد تتغير، فقارن قبل الدفع.</p></div>`;
+}
+function calcLeave(){
+  const el=document.getElementById('tCalc'), v=(document.getElementById('tFly')||{}).value; if(!el) return;
+  if(!v){ el.innerHTML=''; return; }
+  const h={FEZ:1.5,CMN:4.5,RBA:3.5,RAK:6.5}[T.from]||4; // مدة الطريق التقريبية
+  const [H,M]=v.split(':').map(Number); let t=H+M/60-3-h; // الحضور قبل الإقلاع بـ 3 ساعات
+  const day=t<0?' (اليوم السابق)':''; t=fix(t,24);
+  el.innerHTML=`<div class="warn">🕰️ اخرج من أزرو قبل الساعة <b>${fmtT(t)}</b>${day}<br><span class="muted">الحضور للمطار قبل 3 ساعات + نحو ${AR(h)} ساعات طريق وهامش احتياط.</span></div>`;
+}
+
 /* ================== الواجهات ================== */
 let view='home', sub={adhkar:Object.keys(ADHKAR)[0], places:'mecca', more:'plan'};
 function render(){
   document.body.classList.toggle('fs-big', !!settings.big);
   const app=$('#app');
-  app.innerHTML = ({home:vHome, manasik:vManasik, adhkar:vAdhkar, places:vPlaces, more:vMore})[view]();
+  app.innerHTML = ({home:vHome, manasik:vManasik, adhkar:vAdhkar, travel:vTravel, places:vPlaces, more:vMore})[view]();
   document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
   bind(); window.scrollTo(0,0);
 }
@@ -469,6 +571,8 @@ function vHome(){
     <button class="btn goldb" data-go="more:tasbih">📿 السبحة</button>
     <button class="btn light" data-go="adhkar">🤲 الأدعية</button>
     <button class="btn light" data-go="more:maps">🗺️ الخرائط</button>
+    <button class="btn light" data-go="travel">✈️ الطيران والفنادق</button>
+    <button class="btn light" data-go="more:plan">📅 برنامج الرحلة</button>
   </div>`;
 }
 
@@ -587,6 +691,12 @@ function bind(){
   on('[data-pack]','change',e=>{const o=S.get('pack',{}); o[e.currentTarget.dataset.pack]=e.currentTarget.checked; S.set('pack',o); render();});
   on('#notes','input',e=>S.set('notes',e.currentTarget.value));
   on('#sSave','click',()=>{Object.assign(settings,{name:$('#sName').value.trim(),start:$('#sStart').value,days:+$('#sDays').value||15,meccaDays:+$('#sMecca').value||0,order:$('#sOrder').value,city:$('#sCity').value,big:$('#sBig').checked}); saveSettings(); hdr(); toast('تم حفظ الإعدادات ✓'); render();});
+  on('[data-tt]','click',e=>{travelTab=e.currentTarget.dataset.tt; render();});
+  on('#tFrom','change',e=>{T.from=e.currentTarget.value; saveT(); render();});
+  on('#tTo','change',e=>{T.to=e.currentTarget.value; saveT(); render();});
+  on('#tSave','click',()=>{T.out=$('#tOut').value; T.ret=$('#tRet').value; T.adults=Math.max(1,+$('#tAd').value||1); saveT(); toast('تم تحديث البحث'); render();});
+  on('#tFly','input',e=>{S.set('flyTime',e.currentTarget.value); calcLeave();});
+  calcLeave();
   if(deferredPrompt){ const b=$('#installBtn'); if(b){ b.classList.remove('hidden'); b.onclick=()=>{deferredPrompt.prompt(); deferredPrompt=null;}; } }
 }
 document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.v; render();}));

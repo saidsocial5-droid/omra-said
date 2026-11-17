@@ -1,7 +1,7 @@
-/* سعيد عمرة — Service Worker مع تحديث تلقائي
+/* عمرة سعيد — Service Worker مع تحديث تلقائي
    الإصدار يُستبدل تلقائياً عند كل نشر عبر GitHub Actions */
 const VERSION = '__BUILD__';
-const CACHE = 'said-omra-' + VERSION;
+const CACHE = 'omra-said-' + VERSION;
 const FILES = ['./', './index.html', './manifest.json', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png'];
 
 self.addEventListener('install', e => {
