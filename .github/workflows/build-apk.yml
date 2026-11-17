@@ -1,0 +1,69 @@
+# بناء تطبيق أندرويد (APK) ونشره في Releases تلقائياً
+name: Build APK عمرة سعيد
+
+on:
+  push:
+    branches: [main]
+    paths: ['android/**', '.github/workflows/build-apk.yml', 'icons/**']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: نسخ ملفات التطبيق داخل الـ APK (للعمل بدون إنترنت)
+        run: |
+          mkdir -p android/app/src/main/assets/www/icons
+          cp index.html manifest.json android/app/src/main/assets/www/
+          cp icons/* android/app/src/main/assets/www/icons/
+          sed -i "s/__BUILD__/apk-${GITHUB_RUN_NUMBER}/g" android/app/src/main/assets/www/index.html
+
+      - name: مفتاح التوقيع
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            echo "$KEYSTORE_B64" | base64 -d > "$RUNNER_TEMP/omra.jks"
+          else
+            echo "::warning::لا يوجد KEYSTORE_B64 — توقيع بمفتاح مؤقت"
+            keytool -genkeypair -keystore "$RUNNER_TEMP/omra.jks" -alias omra -keyalg RSA -keysize 2048 -validity 10000 \
+              -storepass omrasaid2026 -keypass omrasaid2026 -dname "CN=Omra Said, C=MA"
+          fi
+          echo "KEYSTORE_FILE=$RUNNER_TEMP/omra.jks" >> "$GITHUB_ENV"
+
+      - name: بناء APK
+        env:
+          KEYSTORE_PASS: ${{ secrets.KEYSTORE_PASS || 'omrasaid2026' }}
+        run: |
+          gradle -p android assembleRelease --no-daemon
+          cp android/app/build/outputs/apk/release/app-release.apk omra-said.apk
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: omra-said-apk
+          path: omra-said.apk
+
+      - name: نشر في Releases
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: عمرة سعيد v1.0.${{ github.run_number }}
+          body: |
+            📲 حمّل الملف **omra-said.apk** وثبّته على هاتف الأندرويد.
+            (اسمح بتثبيت التطبيقات من مصادر غير معروفة عند الطلب)
+          files: omra-said.apk
+          make_latest: true
