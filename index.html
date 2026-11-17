@@ -565,7 +565,7 @@ function bind(){
   on('#locBtn','click',locate);
   on('#qSave','click',()=>{const v=$('#qStart').value; if(v){settings.start=v; saveSettings(); render();}});
   on('[data-step]','click',e=>{const i=+e.currentTarget.dataset.step; let d=S.get('stepsDone',[]); d=d.includes(i)?d.filter(x=>x!==i):[...d,i]; S.set('stepsDone',d); vib(30); if(d.length===STEPS.length) toast('تقبّل الله عمرتك 🤲'); render();});
-  on('#resetSteps','click',()=>{ if(confirm('إعادة ضبط كل خطوات العمرة والعدّادات؟')){S.set('stepsDone',[]);S.set('tawaf',0);S.set('sai',0);render();}});
+  on('#resetSteps','click',e=>{ const b=e.currentTarget; if(!b.dataset.sure){ b.dataset.sure='1'; b.textContent='اضغط مرة أخرى للتأكيد'; return; } S.set('stepsDone',[]);S.set('tawaf',0);S.set('sai',0);toast('تمت إعادة الضبط');render();});
   const ringTap=(key,max,msg)=>()=>{let n=S.get(key,0); if(n>=max){toast(msg);return;} n++; S.set(key,n); vib(n===max?[100,60,100]:40); if(n===max) toast(msg); render();};
   on('#twRing','click',ringTap('tawaf',7,'اكتمل الطواف ✓ — صلِّ ركعتين خلف المقام'));
   on('#saRing','click',ringTap('sai',7,'اكتمل السعي ✓ — احلق أو قصّر'));
