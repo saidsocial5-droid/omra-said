@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b3d2e">
+<meta name="description" content="رفيق العمرة — دليلك الذكي خلال رحلة العمرة: المناسك، الأذكار، الأدعية، المزارات، الخرائط ومواقيت الصلاة">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="رفيق العمرة">
+<title>رفيق العمرة</title>
+<style>
+:root{
+  --green:#0b3d2e;--green2:#13573f;--green3:#e8f2ec;--gold:#c9a14a;--gold2:#f5ead0;
+  --ink:#1d2a24;--muted:#5f6f67;--bg:#f7f5ef;--card:#fff;--line:#e4dfd2;--red:#b3412f;
+  --r:16px;--shadow:0 2px 10px rgba(11,61,46,.08);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0}
+body{font-family:"Noto Naskh Arabic","Amiri","Segoe UI",Tahoma,"Geeza Pro",serif;background:var(--bg);color:var(--ink);line-height:1.8;font-size:17px;padding-bottom:84px}
+header{background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;padding:18px 18px 22px;padding-top:max(18px,env(safe-area-inset-top));position:relative;overflow:hidden}
+header::after{content:"";position:absolute;inset:0;background:radial-gradient(circle at 10% 120%,rgba(201,161,74,.35),transparent 55%);pointer-events:none}
+header h1{margin:0;font-size:22px;display:flex;align-items:center;gap:10px}
+header .sub{opacity:.85;font-size:14px}
+.wrap{max-width:720px;margin:0 auto;padding:14px}
+.card{background:var(--card);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-bottom:14px;border:1px solid var(--line)}
+.card h2{margin:0 0 8px;font-size:19px;color:var(--green)}
+.card h3{margin:10px 0 4px;font-size:17px;color:var(--green2)}
+.muted{color:var(--muted);font-size:14px}
+.gold{color:var(--gold)}
+.hero{background:linear-gradient(135deg,#fff,var(--gold2));border:1px solid #ecdcb2}
+.big{font-size:28px;font-weight:700;color:var(--green)}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.pill{display:inline-block;background:var(--green3);color:var(--green);border-radius:999px;padding:2px 12px;font-size:13px}
+.pill.gold{background:var(--gold2);color:#8a6a1f}
+button,.btn{font-family:inherit;font-size:16px;border:0;border-radius:12px;padding:10px 16px;background:var(--green);color:#fff;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:6px;justify-content:center}
+.btn.light{background:var(--green3);color:var(--green)}
+.btn.goldb{background:var(--gold);color:#fff}
+.btn.danger{background:#fbe9e6;color:var(--red)}
+.btn.sm{padding:6px 12px;font-size:14px}
+input,select,textarea{font-family:inherit;font-size:16px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:#fff;width:100%}
+label{font-size:14px;color:var(--muted)}
+nav.bottom{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:6px 4px;padding-bottom:max(6px,env(safe-area-inset-bottom));z-index:50;box-shadow:0 -2px 12px rgba(0,0,0,.05)}
+nav.bottom button{background:none;color:var(--muted);flex-direction:column;gap:0;padding:4px 6px;font-size:12px;flex:1}
+nav.bottom button .ic{font-size:22px;line-height:1.2}
+nav.bottom button.on{color:var(--green);font-weight:700}
+nav.bottom button.on .ic{transform:scale(1.12)}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px;scrollbar-width:none}
+.tabs button{white-space:nowrap;background:#fff;color:var(--green);border:1px solid var(--line);padding:6px 14px;font-size:15px}
+.tabs button.on{background:var(--green);color:#fff;border-color:var(--green)}
+.dua{background:#fffdf7;border-right:4px solid var(--gold);border-radius:10px;padding:12px 14px;margin:8px 0;font-size:19px;line-height:2}
+.dua .src{display:block;font-size:13px;color:var(--muted);margin-top:4px;line-height:1.5}
+.dua .cnt{float:left;margin-right:8px}
+.counter{border:2px solid var(--gold);background:#fff;color:var(--green);border-radius:12px;min-width:64px;padding:4px 10px;font-size:15px}
+.counter.done{background:var(--green);color:#fff;border-color:var(--green)}
+.step{display:flex;gap:12px;align-items:flex-start}
+.step .num{flex:0 0 38px;height:38px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700}
+.step.done .num{background:var(--gold)}
+details{border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin:8px 0;background:#fff}
+details summary{cursor:pointer;font-weight:700;color:var(--green);list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::before{content:"◂ ";color:var(--gold)}
+details[open] summary::before{content:"▾ "}
+ul.clean{padding-right:20px;margin:6px 0}
+.check{display:flex;align-items:center;gap:10px;padding:6px 0;border-bottom:1px dashed var(--line)}
+.check input{width:22px;height:22px;flex:0 0 22px;accent-color:var(--green)}
+.check.ok span{text-decoration:line-through;color:var(--muted)}
+.ring{width:190px;height:190px;border-radius:50%;margin:10px auto;display:flex;flex-direction:column;align-items:center;justify-content:center;background:conic-gradient(var(--gold) calc(var(--p)*1%),var(--green3) 0);position:relative;user-select:none;cursor:pointer}
+.ring::before{content:"";position:absolute;inset:14px;border-radius:50%;background:#fff;box-shadow:inset 0 0 0 1px var(--line)}
+.ring>*{position:relative}
+.ring .n{font-size:54px;font-weight:700;color:var(--green);line-height:1}
+.prayer{display:flex;justify-content:space-between;padding:8px 4px;border-bottom:1px solid var(--line)}
+.prayer.next{background:var(--gold2);border-radius:10px;padding:8px 10px;font-weight:700}
+.place{display:flex;gap:12px}
+.place .em{font-size:30px;flex:0 0 40px;text-align:center}
+.map{width:100%;height:330px;border:0;border-radius:12px;background:var(--green3)}
+.day{border-right:4px solid var(--green3);padding:4px 12px;margin:10px 0}
+.day.today{border-color:var(--gold);background:var(--gold2);border-radius:10px}
+.toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%);background:var(--green);color:#fff;padding:10px 18px;border-radius:999px;font-size:15px;opacity:0;transition:.3s;z-index:99;pointer-events:none}
+.toast.show{opacity:1}
+.search{margin-bottom:10px}
+.hidden{display:none!important}
+.now-box{background:var(--green);color:#fff;border:0}
+.now-box h2{color:var(--gold2)}
+.now-box .muted{color:#cfe3d8}
+.warn{background:#fff6e5;border:1px solid #f0d9a5;border-radius:12px;padding:10px 12px;font-size:15px}
+.fs-big .dua{font-size:23px}
+@media (min-width:600px){body{font-size:18px}}
+</style>
+</head>
+<body>
+<header>
+  <h1>🕋 رفيق العمرة</h1>
+  <div class="sub" id="hdrDate"></div>
+</header>
+
+<main class="wrap" id="app"></main>
+
+<nav class="bottom" id="nav">
+  <button data-v="home" class="on"><span class="ic">🏠</span>الرئيسية</button>
+  <button data-v="manasik"><span class="ic">🕋</span>المناسك</button>
+  <button data-v="adhkar"><span class="ic">📿</span>الأذكار</button>
+  <button data-v="places"><span class="ic">🗺️</span>المزارات</button>
+  <button data-v="more"><span class="ic">☰</span>المزيد</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ================== التخزين ================== */
+const S = {
+  get(k, d){ try{ const v = localStorage.getItem('umrah_'+k); return v===null? d : JSON.parse(v);}catch(e){return d;} },
+  set(k, v){ try{ localStorage.setItem('umrah_'+k, JSON.stringify(v)); }catch(e){} }
+};
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function toast(m){ const t=$('#toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove('show'),1800); }
+function vib(ms){ try{ navigator.vibrate && navigator.vibrate(ms); }catch(e){} }
+const AR = n => String(n).replace(/\d/g, d=>'٠١٢٣٤٥٦٧٨٩'[d]);
+
+/* ================== الإعدادات ================== */
+const settings = Object.assign({
+  start: '', days: 15, order: 'mecca', meccaDays: 8, city: 'auto', big: false, name: ''
+}, S.get('settings', {}));
+function saveSettings(){ S.set('settings', settings); }
+
+/* ================== البيانات: المناسك ================== */
+const STEPS = [
+  { t:'الاستعداد قبل الميقات', body:`
+    <ul class="clean">
+      <li>الاغتسال كغسل الجنابة (سنة للرجل والمرأة، حتى الحائض والنفساء).</li>
+      <li>تطييب البدن (للرجل) لا ثياب الإحرام، وتقليم الأظافر وأخذ ما يُشرع أخذه.</li>
+      <li>الرجل يلبس إزاراً ورداءً أبيضين نظيفين ونعلين، والمرأة تلبس ما شاءت من الثياب الساترة غير المتبرجة، ولا تلبس النقاب ولا القفازين.</li>
+    </ul>
+    <div class="warn">✈️ <b>إن كنت قادماً جواً من المغرب إلى جدة:</b> الميقات يُحاذى في الطائرة (ميقات الجحفة/رابغ)، فالبس الإحرام في المطار أو قبل الإقلاع، وانوِ عند إعلان الطيار محاذاة الميقات. <br>🕌 <b>إن بدأت بالمدينة:</b> ميقاتك ذو الحليفة (مسجد الميقات / أبيار علي) عند خروجك إلى مكة.</div>` },
+  { t:'الإحرام ونية العمرة', body:`
+    <p>عند الميقات تنوي الدخول في النسك وتقول:</p>
+    <div class="dua">لبيك عمرة</div>
+    <p>وإن خشيت عائقاً (مرض ونحوه) تشترط:</p>
+    <div class="dua">اللهم مَحِلّي حيث حبستني</div>
+    <details><summary>محظورات الإحرام</summary>
+      <ul class="clean">
+        <li>إزالة الشعر وتقليم الأظافر.</li><li>استعمال الطيب في البدن أو الثوب بعد الإحرام.</li>
+        <li>للرجل: لبس المخيط (القميص، السراويل…) وتغطية الرأس بملاصق.</li>
+        <li>للمرأة: النقاب والقفازان (وتستر وجهها عن الرجال الأجانب بغير النقاب كالخمار المسدول).</li>
+        <li>قتل الصيد البري، وعقد النكاح، والجماع ومقدماته.</li>
+      </ul>
+      <p class="muted">من فعل محظوراً ناسياً أو جاهلاً فلا شيء عليه، ويتوقف فوراً متى تذكّر.</p>
+    </details>` },
+  { t:'التلبية', body:`
+    <p>يكثر منها الرجل رافعاً صوته، والمرأة تُسِرّ بها، من الإحرام حتى يبدأ الطواف.</p>
+    <div class="dua">لبيك اللهم لبيك، لبيك لا شريك لك لبيك، إن الحمد والنعمة لك والملك، لا شريك لك<span class="src">متفق عليه</span></div>` },
+  { t:'دخول المسجد الحرام', body:`
+    <p>قدّم رجلك اليمنى وقل:</p>
+    <div class="dua">بسم الله، والصلاة والسلام على رسول الله، اللهم افتح لي أبواب رحمتك<span class="src">رواه مسلم وغيره</span></div>
+    <p>عند رؤية الكعبة: ادعُ بما تحب، فهو موطن خشوع ورجاء.</p>
+    <p class="muted">💡 احفظ رقم الباب الذي دخلت منه وصوِّره، واتفق مع رفيقك على مكان لقاء ثابت.</p>` },
+  { t:'الطواف (٧ أشواط)', body:`
+    <ul class="clean">
+      <li>يُشترط الطهارة من الحدثين وستر العورة.</li>
+      <li><b>الاضطباع</b> للرجل: يجعل وسط الرداء تحت إبطه الأيمن وطرفيه على كتفه الأيسر — في طواف العمرة فقط.</li>
+      <li>ابدأ من <b>الحجر الأسود</b> (الخط البني على الأرض سابقاً / محاذاة الحجر) واجعل الكعبة عن يسارك.</li>
+      <li>استلم الحجر وقبّله إن تيسّر بلا مزاحمة، وإلا أشر إليه بيدك وقل: <b>الله أكبر</b>.</li>
+      <li><b>الرَّمَل</b> (الإسراع مع مقاربة الخطى) للرجل في الأشواط الثلاثة الأولى إن أمكن.</li>
+      <li>الركن اليماني: يُستلم باليد إن تيسّر بلا تقبيل ولا إشارة.</li>
+      <li>بين الركن اليماني والحجر الأسود قل:</li>
+    </ul>
+    <div class="dua">ربنا آتنا في الدنيا حسنة، وفي الآخرة حسنة، وقنا عذاب النار<span class="src">رواه أبو داود</span></div>
+    <div class="warn">📌 لا يوجد دعاء مخصّص لكل شوط؛ ادعُ بما تشاء واذكر الله واقرأ القرآن. استعمل <b>عدّاد الطواف</b> في الأسفل حتى لا تنسى العدد.</div>` },
+  { t:'ركعتا الطواف وزمزم', body:`
+    <ul class="clean">
+      <li>غطِّ كتفك الأيمن (انتهى الاضطباع).</li>
+      <li>صلِّ ركعتين خلف مقام إبراهيم إن تيسّر وإلا ففي أي مكان من المسجد، تقرأ في الأولى <b>الكافرون</b> وفي الثانية <b>الإخلاص</b>.</li>
+      <li>اشرب من ماء زمزم وادعُ: «ماء زمزم لِما شُرب له» (رواه ابن ماجه).</li>
+    </ul>` },
+  { t:'السعي بين الصفا والمروة (٧ أشواط)', body:`
+    <p>عند الدنو من الصفا (أول مرة فقط) اقرأ:</p>
+    <div class="dua">﴿إِنَّ الصَّفَا وَالْمَرْوَةَ مِنْ شَعَائِرِ اللَّهِ﴾ أبدأ بما بدأ الله به</div>
+    <p>ثم اصعد الصفا واستقبل الكعبة وارفع يديك وقل ثلاث مرات مع الدعاء بينها:</p>
+    <div class="dua">الله أكبر، الله أكبر، الله أكبر، لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير، لا إله إلا الله وحده، أنجز وعده، ونصر عبده، وهزم الأحزاب وحده<span class="src">رواه مسلم</span></div>
+    <ul class="clean">
+      <li>الذهاب من الصفا إلى المروة شوط، والرجوع شوط آخر؛ تبدأ بالصفا وتنتهي بالمروة.</li>
+      <li>يسعى الرجل سعياً شديداً بين <b>العلمين الأخضرين</b> (الإضاءة الخضراء)، والمرأة تمشي.</li>
+      <li>تفعل على المروة كما فعلت على الصفا. لا تُشترط الطهارة للسعي لكنها أفضل.</li>
+    </ul>` },
+  { t:'الحلق أو التقصير — والتحلّل', body:`
+    <ul class="clean">
+      <li>الرجل: الحلق أفضل (دعا النبي ﷺ للمحلّقين ثلاثاً)، أو التقصير من جميع الرأس.</li>
+      <li>المرأة: تجمع شعرها وتقصّ منه قدر أنملة (نحو ٢ سم).</li>
+      <li>بذلك تمّت عمرتك وحلّ لك كل ما حُرّم بالإحرام. تقبّل الله منك 🤲</li>
+    </ul>` }
+];
+
+/* ================== البيانات: الأذكار والأدعية ================== */
+const ADHKAR = {
+  'السفر':[
+    {x:'الله أكبر، الله أكبر، الله أكبر، ﴿سُبْحَانَ الَّذِي سَخَّرَ لَنَا هَٰذَا وَمَا كُنَّا لَهُ مُقْرِنِينَ وَإِنَّا إِلَىٰ رَبِّنَا لَمُنقَلِبُونَ﴾، اللهم إنا نسألك في سفرنا هذا البر والتقوى، ومن العمل ما ترضى، اللهم هوّن علينا سفرنا هذا واطوِ عنا بُعده، اللهم أنت الصاحب في السفر، والخليفة في الأهل، اللهم إني أعوذ بك من وعثاء السفر، وكآبة المنظر، وسوء المنقلب في المال والأهل', s:'دعاء السفر — رواه مسلم'},
+    {x:'أعوذ بكلمات الله التامات من شر ما خلق', s:'عند النزول بمكان — رواه مسلم', c:3},
+    {x:'أستودعكم الله الذي لا تضيع ودائعه', s:'توديع الأهل — رواه ابن ماجه'},
+    {x:'آيبون، تائبون، عابدون، لربنا حامدون', s:'عند الرجوع من السفر — متفق عليه'}
+  ],
+  'المسجد':[
+    {x:'أعوذ بالله العظيم، وبوجهه الكريم، وسلطانه القديم، من الشيطان الرجيم', s:'عند دخول المسجد — رواه أبو داود'},
+    {x:'بسم الله، والصلاة والسلام على رسول الله، اللهم افتح لي أبواب رحمتك', s:'دخول المسجد — رواه مسلم'},
+    {x:'بسم الله، والصلاة والسلام على رسول الله، اللهم إني أسألك من فضلك', s:'الخروج من المسجد — رواه مسلم'}
+  ],
+  'الصباح والمساء':[
+    {x:'آية الكرسي: الله لا إله إلا هو الحي القيوم، لا تأخذه سنة ولا نوم، له ما في السماوات وما في الأرض، من ذا الذي يشفع عنده إلا بإذنه، يعلم ما بين أيديهم وما خلفهم، ولا يحيطون بشيء من علمه إلا بما شاء، وسع كرسيه السماوات والأرض، ولا يؤوده حفظهما، وهو العلي العظيم', s:'البقرة ٢٥٥', c:1},
+    {x:'سورة الإخلاص، والفلق، والناس', s:'رواه أبو داود والترمذي', c:3},
+    {x:'أصبحنا وأصبح الملك لله، والحمد لله، لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير (وفي المساء: أمسينا وأمسى الملك لله)', s:'رواه مسلم', c:1},
+    {x:'اللهم أنت ربي لا إله إلا أنت، خلقتني وأنا عبدك، وأنا على عهدك ووعدك ما استطعت، أعوذ بك من شر ما صنعت، أبوء لك بنعمتك عليّ، وأبوء بذنبي فاغفر لي، فإنه لا يغفر الذنوب إلا أنت', s:'سيد الاستغفار — رواه البخاري', c:1},
+    {x:'بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم', s:'رواه أبو داود والترمذي', c:3},
+    {x:'رضيت بالله رباً، وبالإسلام ديناً، وبمحمد ﷺ نبياً', s:'رواه أبو داود', c:3},
+    {x:'حسبي الله لا إله إلا هو، عليه توكلت وهو رب العرش العظيم', s:'رواه أبو داود', c:7},
+    {x:'اللهم عافني في بدني، اللهم عافني في سمعي، اللهم عافني في بصري، لا إله إلا أنت', s:'رواه أبو داود', c:3},
+    {x:'سبحان الله وبحمده', s:'رواه مسلم', c:100},
+    {x:'لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير', s:'متفق عليه', c:10}
+  ],
+  'بعد الصلاة':[
+    {x:'أستغفر الله', s:'رواه مسلم', c:3},
+    {x:'اللهم أنت السلام ومنك السلام، تباركت يا ذا الجلال والإكرام', s:'رواه مسلم', c:1},
+    {x:'سبحان الله', s:'رواه مسلم', c:33},
+    {x:'الحمد لله', s:'رواه مسلم', c:33},
+    {x:'الله أكبر', s:'رواه مسلم', c:33},
+    {x:'لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير (تمام المئة)', s:'رواه مسلم', c:1},
+    {x:'آية الكرسي', s:'رواه النسائي', c:1}
+  ],
+  'أدعية قرآنية':[
+    {x:'﴿رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ﴾', s:'البقرة ٢٠١'},
+    {x:'﴿رَبَّنَا تَقَبَّلْ مِنَّا إِنَّكَ أَنتَ السَّمِيعُ الْعَلِيمُ﴾', s:'البقرة ١٢٧'},
+    {x:'﴿رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً إِنَّكَ أَنتَ الْوَهَّابُ﴾', s:'آل عمران ٨'},
+    {x:'﴿رَبَّنَا هَبْ لَنَا مِنْ أَزْوَاجِنَا وَذُرِّيَّاتِنَا قُرَّةَ أَعْيُنٍ وَاجْعَلْنَا لِلْمُتَّقِينَ إِمَامًا﴾', s:'الفرقان ٧٤'},
+    {x:'﴿رَبِّ اشْرَحْ لِي صَدْرِي وَيَسِّرْ لِي أَمْرِي﴾', s:'طه ٢٥–٢٦'},
+    {x:'﴿رَبِّ اجْعَلْنِي مُقِيمَ الصَّلَاةِ وَمِن ذُرِّيَّتِي رَبَّنَا وَتَقَبَّلْ دُعَاءِ﴾', s:'إبراهيم ٤٠'},
+    {x:'﴿رَبَّنَا اغْفِرْ لِي وَلِوَالِدَيَّ وَلِلْمُؤْمِنِينَ يَوْمَ يَقُومُ الْحِسَابُ﴾', s:'إبراهيم ٤١'},
+    {x:'﴿رَّبِّ ارْحَمْهُمَا كَمَا رَبَّيَانِي صَغِيرًا﴾', s:'الإسراء ٢٤'},
+    {x:'﴿لَّا إِلَٰهَ إِلَّا أَنتَ سُبْحَانَكَ إِنِّي كُنتُ مِنَ الظَّالِمِينَ﴾', s:'الأنبياء ٨٧'}
+  ],
+  'أدعية نبوية':[
+    {x:'اللهم إني أسألك العفو والعافية في الدنيا والآخرة', s:'رواه أبو داود وابن ماجه'},
+    {x:'اللهم إنك عفوّ تحب العفو فاعفُ عني', s:'رواه الترمذي'},
+    {x:'يا مقلّب القلوب ثبّت قلبي على دينك', s:'رواه الترمذي'},
+    {x:'اللهم أصلح لي ديني الذي هو عصمة أمري، وأصلح لي دنياي التي فيها معاشي، وأصلح لي آخرتي التي فيها معادي، واجعل الحياة زيادة لي في كل خير، واجعل الموت راحة لي من كل شر', s:'رواه مسلم'},
+    {x:'اللهم إني أسألك الهدى والتقى والعفاف والغنى', s:'رواه مسلم'},
+    {x:'اللهم إني أسألك الجنة وأعوذ بك من النار', s:'رواه أبو داود'},
+    {x:'اللهم أعنّي على ذكرك وشكرك وحسن عبادتك', s:'رواه أبو داود والنسائي'},
+    {x:'اللهم إني أعوذ بك من الهمّ والحزن، والعجز والكسل، والبخل والجبن، وضلع الدين وغلبة الرجال', s:'رواه البخاري'},
+    {x:'اللهم صلِّ على محمد وعلى آل محمد كما صليت على إبراهيم وعلى آل إبراهيم إنك حميد مجيد، اللهم بارك على محمد وعلى آل محمد كما باركت على إبراهيم وعلى آل إبراهيم إنك حميد مجيد', s:'الصلاة الإبراهيمية — متفق عليه'}
+  ],
+  'المدينة والزيارة':[
+    {x:'السلام عليك يا رسول الله ورحمة الله وبركاته', s:'عند السلام على النبي ﷺ — بأدب وخفض صوت'},
+    {x:'السلام عليك يا أبا بكر، السلام عليك يا عمر', s:'ثم السلام على صاحبيه رضي الله عنهما'},
+    {x:'السلام عليكم أهل الديار من المؤمنين والمسلمين، وإنا إن شاء الله بكم للاحقون، نسأل الله لنا ولكم العافية', s:'زيارة البقيع وشهداء أحد — رواه مسلم'},
+    {x:'﴿رَّبِّ أَدْخِلْنِي مُدْخَلَ صِدْقٍ وَأَخْرِجْنِي مُخْرَجَ صِدْقٍ وَاجْعَل لِّي مِن لَّدُنكَ سُلْطَانًا نَّصِيرًا﴾', s:'الإسراء ٨٠'}
+  ],
+  'أدعيتي الخاصة':[]
+};
+
+/* ================== البيانات: المزارات ================== */
+const PLACES = {
+  mecca:[
+    {n:'المسجد الحرام والكعبة المشرفة', e:'🕋', d:'الصلاة فيه بمئة ألف صلاة. احرص على الصلوات الخمس فيه وعلى الطواف النافلة.', q:'المسجد الحرام مكة'},
+    {n:'جبل النور (غار حراء)', e:'⛰️', d:'موضع نزول الوحي أول مرة. الصعود شاق (نحو ساعة)؛ اذهب بعد الفجر وخذ ماءً. الصعود ليس عبادة مشروعة بذاته.', q:'جبل النور غار حراء'},
+    {n:'حي حراء الثقافي', e:'🏛️', d:'متحف ومعرض الوحي عند سفح جبل النور، تجربة جميلة عن نزول القرآن.', q:'حي حراء الثقافي مكة'},
+    {n:'جبل ثور', e:'⛰️', d:'فيه الغار الذي اختبأ فيه النبي ﷺ وأبو بكر في الهجرة.', q:'جبل ثور مكة'},
+    {n:'عرفات وجبل الرحمة', e:'🌄', d:'مشعر الحج الأعظم، زيارة تاريخية للتأمل (لا عبادة مخصوصة خارج الحج).', q:'جبل الرحمة عرفات'},
+    {n:'مزدلفة ومنى والجمرات', e:'⛺', d:'المشاعر المقدسة، مشاهدة الخيام ومسجد الخيف ومنشأة الجمرات.', q:'منشأة الجمرات منى'},
+    {n:'مسجد التنعيم (مسجد عائشة)', e:'🕌', d:'أقرب الحل للحرم، يحرم منه من أراد عمرة ثانية وهو بمكة.', q:'مسجد عائشة التنعيم'},
+    {n:'مسجد الجعرانة', e:'🕌', d:'أحرم منه النبي ﷺ لعمرته بعد غزوة حنين.', q:'مسجد الجعرانة'},
+    {n:'مقبرة المعلاة', e:'🌿', d:'فيها قبر أم المؤمنين خديجة رضي الله عنها، تُزار للسلام والدعاء للأموات.', q:'مقبرة المعلاة مكة'},
+    {n:'معرض عمارة الحرمين الشريفين', e:'🖼️', d:'في حي أم الجود: قطع أثرية من الكعبة وباب الكعبة القديم.', q:'معرض عمارة الحرمين الشريفين'},
+    {n:'مصنع كسوة الكعبة', e:'🧵', d:'مجمع الملك عبدالعزيز لكسوة الكعبة — قد تحتاج تنسيقاً مسبقاً للزيارة.', q:'مجمع الملك عبدالعزيز لكسوة الكعبة المشرفة'}
+  ],
+  medina:[
+    {n:'المسجد النبوي الشريف', e:'🕌', d:'الصلاة فيه خير من ألف صلاة فيما سواه إلا المسجد الحرام.', q:'المسجد النبوي'},
+    {n:'الروضة الشريفة', e:'🌿', d:'«ما بين بيتي ومنبري روضة من رياض الجنة». تتطلب حجز موعد عبر تطبيق «نسك».', q:'الروضة الشريفة المسجد النبوي'},
+    {n:'مسجد قباء', e:'🕌', d:'«من تطهّر في بيته ثم أتى مسجد قباء فصلى فيه صلاة كان له كأجر عمرة». يُستحب يوم السبت.', q:'مسجد قباء'},
+    {n:'جبل أحد ومقبرة الشهداء', e:'⛰️', d:'«أحد جبل يحبنا ونحبه». فيه قبر حمزة رضي الله عنه وشهداء أحد، وجبل الرماة.', q:'مقبرة شهداء أحد'},
+    {n:'بقيع الغرقد', e:'🌿', d:'مقبرة أهل المدينة، فيها كثير من الصحابة وأمهات المؤمنين. للرجال، بعد الفجر أو العصر عادة.', q:'البقيع المدينة'},
+    {n:'مسجد القبلتين', e:'🕌', d:'حيث نزل الأمر بتحويل القبلة إلى الكعبة.', q:'مسجد القبلتين'},
+    {n:'موقع غزوة الخندق والمساجد السبعة', e:'🏞️', d:'موقع الخندق التاريخي، ومسجد الفتح.', q:'المساجد السبعة المدينة'},
+    {n:'مسجد الميقات (ذو الحليفة)', e:'🕌', d:'ميقات أهل المدينة، تحرم منه للعمرة إن ذهبت من المدينة إلى مكة.', q:'مسجد ذو الحليفة أبيار علي'},
+    {n:'مجمع الملك فهد لطباعة المصحف', e:'📖', d:'جولة لمعرفة مراحل طباعة المصحف، وغالباً يُهدى مصحف للزائر.', q:'مجمع الملك فهد لطباعة المصحف الشريف'},
+    {n:'متحف السيرة النبوية / دار المدينة', e:'🏛️', d:'معارض عن السيرة وتاريخ المدينة المنورة.', q:'متحف دار المدينة'},
+    {n:'مزارع التمور وسوق التمور', e:'🌴', d:'اشترِ تمر العجوة والسكري والصقعي للهدايا.', q:'سوق التمور المدينة المنورة'}
+  ]
+};
+
+/* ================== نصائح ذهبية ================== */
+const TIPS = [
+  ['النية والإخلاص','جدّد نيتك، واجعل رحلتك عبادة كاملة: قلّل الانشغال بالهاتف والتصوير والأسواق.'],
+  ['تطبيق نسك','حمّل تطبيق «نسك» قبل السفر: حجز الروضة الشريفة وتصاريح أخرى. احجز الروضة مبكراً فالمواعيد تنفد.'],
+  ['نقطة لقاء','اتفق مع زوجتك/رفيقك على نقطة لقاء ثابتة (رقم باب محدد) وشارك موقعك المباشر في الهاتف.'],
+  ['رقم الباب','صوِّر رقم الباب الذي تدخل منه. باب الملك عبدالعزيز رقم ١، باب الملك فهد رقم ٧٩، باب السلام في المسجد النبوي.'],
+  ['أوقات الطواف','أخفّ الأوقات غالباً: بعد منتصف الليل وفي الضحى. تجنّب أوقات ما بعد الصلوات مباشرة.'],
+  ['الحجر الأسود','لا تزاحم ولا تؤذِ أحداً لتقبيله؛ الإشارة تكفي وأجرها حاصل بإذن الله.'],
+  ['الأحذية','احمل كيساً صغيراً للحذاء، ولا تتركه عند الأبواب فقد يضيع.'],
+  ['الماء والصحة','اشرب زمزم والماء باستمرار، استعمل مظلة وكريم واقٍ، وكريماً للاحتكاك بين الفخذين أثناء الإحرام.'],
+  ['الحذاء المريح','نعل مريح ومجرّب مسبقاً — ستمشي كيلومترات يومياً.'],
+  ['بطاقة الفندق','احمل بطاقة الفندق واسمه بالعربية، ونسخة من الجواز في الهاتف.'],
+  ['شريحة الهاتف','اشترِ شريحة سعودية (STC / موبايلي / زين) من المطار مع باقة إنترنت.'],
+  ['قطار الحرمين','قطار الحرمين يربط مكة والمدينة في نحو ساعتين ونصف؛ احجز مسبقاً عبر الموقع الرسمي.'],
+  ['الصلاة على الجنائز','بعد أغلب الفرائض في الحرمين صلاة جنازة، تعلّمها: أربع تكبيرات بلا ركوع ولا سجود.'],
+  ['الأدب مع الناس','الحرم يجمع الأمم؛ الصبر وحسن الخلق من تمام العبادة. لا تجادل.'],
+  ['عمرة ثانية؟','يجوز الإحرام من التنعيم لعمرة أخرى، لكن الإكثار من الطواف بالبيت أفضل عند كثير من العلماء.'],
+  ['الدعاء للأهل','اكتب قائمة بأسماء من أوصاك بالدعاء في «أدعيتي الخاصة» حتى لا تنساهم.'],
+  ['الغبطة بالوقت','١٥ يوماً تمرّ بسرعة: اختم القرآن (جزءان يومياً)، وحافظ على الصف الأول ما استطعت.'],
+  ['النساء','الحائض تؤدي كل المناسك إلا الطواف والصلاة، تنتظر حتى تطهر ثم تطوف.']
+];
+
+/* ================== قائمة التجهيز ================== */
+const PACK = ['جواز السفر والتأشيرة','تذاكر الطيران وحجز الفندق','نسخ إلكترونية للوثائق','ملابس الإحرام (قطعتان) + احتياطية','حزام الإحرام للنقود','نعل مريح','الأدوية الشخصية والوصفات','مظلة شمسية','كريم واقٍ من الشمس وكريم للاحتكاك (غير معطر)','صابون ومناديل غير معطرة','قارورة ماء صغيرة','شاحن متنقل (Power Bank)','مصحف جيب أو تطبيق','سجادة صلاة خفيفة','كيس للأحذية','بطاقة بنكية دولية + ريالات نقداً','مقص/ماكينة للحلق أو التقصير','قائمة الدعاء لمن أوصاك'];
+
+/* ================== برنامج الأيام ================== */
+const MECCA_PLAN = [
+  ['الوصول وأداء العمرة','الراحة قليلاً ثم أداء العمرة بتأنٍّ (افتح قسم المناسك). الحلق/التقصير.'],
+  ['يوم راحة وعبادة','الصلوات الخمس في الحرم، طواف نافلة، قراءة القرآن.'],
+  ['زيارة جبل النور وحي حراء الثقافي','اخرج بعد الفجر مبكراً، ثم ارجع لصلاة الظهر في الحرم.'],
+  ['يوم الحرم','طواف بعد منتصف الليل، الإكثار من الدعاء في الملتزم.'],
+  ['جولة المشاعر','عرفات وجبل الرحمة، مزدلفة، منى — ويُفضَّل مع حملة/سائق.'],
+  ['معرض عمارة الحرمين ومقبرة المعلاة','زيارة في الصباح، ثم العبادة بقية اليوم.'],
+  ['يوم الحرم والدعاء','خصّص وقتاً لقائمة الدعاء لأهلك ومن أوصاك.'],
+  ['طواف الوداع والاستعداد','آخر ما تفعله بمكة طواف الوداع (مستحب للمعتمر عند جمع من العلماء)، ثم السفر.']
+];
+const MEDINA_PLAN = [
+  ['الوصول إلى المدينة','الصلاة في المسجد النبوي والسلام على النبي ﷺ وصاحبيه.'],
+  ['الروضة الشريفة','حسب موعدك في تطبيق نسك، والإكثار من الصلاة على النبي ﷺ.'],
+  ['مسجد قباء','تطهّر في الفندق ثم صلِّ فيه ركعتين (كأجر عمرة).'],
+  ['جبل أحد وشهداء أحد','السلام على الشهداء وجبل الرماة، ثم مسجد القبلتين.'],
+  ['البقيع والمساجد السبعة','زيارة البقيع بعد الفجر (للرجال)، ثم موقع الخندق.'],
+  ['مجمع طباعة المصحف ومتحف السيرة','جولة ثقافية، وشراء التمور والهدايا.'],
+  ['يوم المسجد النبوي','عبادة وقراءة، والتهيؤ للسفر. إن كانت مكة بعدها فأحرم من ذي الحليفة.']
+];
+function buildPlan(){
+  const total = Math.max(1, +settings.days||15);
+  const md = Math.min(total, Math.max(0, +settings.meccaDays||8));
+  const nd = total - md;
+  const fill = (tpl, n, city) => {
+    const out=[]; for(let i=0;i<n;i++){
+      let it;
+      if(i===0) it=tpl[0]; else if(i===n-1 && n>1) it=tpl[tpl.length-1];
+      else { const mid = tpl.slice(1,-1); it = mid[(i-1)%mid.length]; }
+      out.push({city, t:it[0], d:it[1]});
+    } return out; };
+  let m = fill(MECCA_PLAN, md, 'مكة'), n = fill(MEDINA_PLAN, nd, 'المدينة');
+  if(settings.order==='medina'){
+    // إن بدأ بالمدينة فالعمرة عند الوصول لمكة، ويُنبَّه على الإحرام من ذي الحليفة
+    if(n.length) n[n.length-1] = {city:'المدينة', t:'الإحرام من ذي الحليفة والسفر لمكة', d:'اغتسل والبس الإحرام وانوِ العمرة عند مسجد الميقات.'};
+    return n.concat(m);
+  }
+  return m.concat(n);
+}
+function tripDay(){
+  if(!settings.start) return null;
+  const s = new Date(settings.start+'T00:00:00'); const now = new Date(); now.setHours(0,0,0,0);
+  return Math.floor((now - s)/86400000) + 1;
+}
+
+/* ================== مواقيت الصلاة (طريقة أم القرى) ================== */
+const CITIES = { mecca:{n:'مكة المكرمة',lat:21.4225,lng:39.8262}, medina:{n:'المدينة المنورة',lat:24.4672,lng:39.6111} };
+const dtr=d=>d*Math.PI/180, rtd=r=>r*180/Math.PI;
+const fix=(a,b)=>{a=a-b*Math.floor(a/b);return a<0?a+b:a};
+function julian(y,m,d){ if(m<=2){y--;m+=12;} const A=Math.floor(y/100),B=2-A+Math.floor(A/4); return Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+B-1524.5; }
+function sunPos(jd){
+  const D=jd-2451545.0, g=fix(357.529+0.98560028*D,360), q=fix(280.459+0.98564736*D,360);
+  const L=fix(q+1.915*Math.sin(dtr(g))+0.020*Math.sin(dtr(2*g)),360), e=23.439-0.00000036*D;
+  const RA=fix(rtd(Math.atan2(Math.cos(dtr(e))*Math.sin(dtr(L)),Math.cos(dtr(L))))/15,24);
+  return {decl:rtd(Math.asin(Math.sin(dtr(e))*Math.sin(dtr(L)))), eqt:q/15-RA};
+}
+function prayerTimes(date, c){
+  const tz=3, jd0=julian(date.getFullYear(),date.getMonth()+1,date.getDate())-c.lng/(15*24);
+  const mid=t=>{const eq=sunPos(jd0+t).eqt; return fix(12-eq,24);};
+  const ang=(a,t,ccw)=>{const p=sunPos(jd0+t), n=mid(t);
+    const v=(-Math.sin(dtr(a))-Math.sin(dtr(p.decl))*Math.sin(dtr(c.lat)))/(Math.cos(dtr(p.decl))*Math.cos(dtr(c.lat)));
+    const h=rtd(Math.acos(Math.max(-1,Math.min(1,v))))/15; return n+(ccw?-h:h);};
+  const asr=t=>{const p=sunPos(jd0+t); const a=-rtd(Math.atan(1/(1+Math.tan(dtr(Math.abs(c.lat-p.decl)))))); return ang(a,t);};
+  const adj=t=>t+tz-c.lng/15;
+  const fajr=adj(ang(18.5,5/24,true)), sunrise=adj(ang(0.833,6/24,true)), dhuhr=adj(mid(12/24))+1/60,
+        asrT=adj(asr(13/24)), maghrib=adj(ang(0.833,18/24));
+  return [['الفجر',fajr],['الشروق',sunrise],['الظهر',dhuhr],['العصر',asrT],['المغرب',maghrib],['العشاء',maghrib+1.5]];
+}
+const fmtT=h=>{h=fix(h+0.5/60,24);const H=Math.floor(h),M=Math.floor((h-H)*60);return AR(String(H).padStart(2,'0')+':'+String(M).padStart(2,'0'));};
+function saudiNow(){ const n=new Date(); return new Date(n.getTime()+n.getTimezoneOffset()*60000+3*3600000); }
+
+/* ================== تحديد المدينة ================== */
+function currentCity(){
+  if(settings.city!=='auto') return settings.city;
+  const g = S.get('geo', null);
+  if(g){ const dM=Math.hypot(g.lat-21.42,g.lng-39.83), dD=Math.hypot(g.lat-24.47,g.lng-39.61); return dM<dD?'mecca':'medina'; }
+  const d=tripDay(), plan=buildPlan();
+  if(d && d>=1 && d<=plan.length) return plan[d-1].city==='مكة'?'mecca':'medina';
+  return 'mecca';
+}
+function locate(){
+  if(!navigator.geolocation){ toast('الموقع غير متاح'); return; }
+  navigator.geolocation.getCurrentPosition(p=>{ S.set('geo',{lat:p.coords.latitude,lng:p.coords.longitude}); settings.city='auto'; saveSettings(); toast('تم تحديد موقعك ✓'); render(); },
+    ()=>toast('تعذّر تحديد الموقع'), {timeout:10000});
+}
+
+/* ================== المساعد الذكي: ماذا أفعل الآن؟ ================== */
+function smartNow(){
+  const c=CITIES[currentCity()], sn=saudiNow(), h=sn.getHours()+sn.getMinutes()/60;
+  const pt=prayerTimes(sn,c).filter(p=>p[0]!=='الشروق');
+  let next=pt.find(p=>p[1]>h); const nextName=next?next[0]:'الفجر';
+  let diff=next? next[1]-h : (24-h)+pt[0][1];
+  const mins=Math.round(diff*60);
+  const done=S.get('stepsDone',[]);
+  const umrahDone = done.length>=STEPS.length;
+  const d=tripDay(), plan=buildPlan();
+  let tip='';
+  if(d && d>=1 && d<=plan.length && !umrahDone && plan[d-1].city==='مكة') tip='🕋 لم تكمل خطوات العمرة بعد — افتح «المناسك» وتابع خطوة بخطوة.';
+  else if(mins<=30) tip=`🕌 بقي ${AR(mins)} دقيقة على ${nextName} — توجّه إلى المسجد الآن، وجدّد الوضوء.`;
+  else if(h>pt[0][1] && h<pt[0][1]+2) tip='☀️ وقت أذكار الصباح — افتح «الأذكار».';
+  else if(h>=pt[3][1] && h<pt[4][1]) tip='🌇 بين العصر والمغرب: وقت أذكار المساء والدعاء.';
+  else if(h>=0 && h<pt[0][1]-0.5) tip='🌙 الثلث الأخير من الليل: وقت نزول الرحمة — صلِّ ما تيسّر وادعُ، والطواف الآن أخف زحاماً.';
+  else if(d && d>=1 && d<=plan.length) tip='📅 برنامج اليوم: '+plan[d-1].t;
+  else tip='📿 أكثِر من الذكر والصلاة على النبي ﷺ.';
+  return {next:nextName, mins, tip, city:c.n};
+}
+
+/* ================== الواجهات ================== */
+let view='home', sub={adhkar:Object.keys(ADHKAR)[0], places:'mecca', more:'plan'};
+function render(){
+  document.body.classList.toggle('fs-big', !!settings.big);
+  const app=$('#app');
+  app.innerHTML = ({home:vHome, manasik:vManasik, adhkar:vAdhkar, places:vPlaces, more:vMore})[view]();
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on', b.dataset.v===view));
+  bind(); window.scrollTo(0,0);
+}
+function hdr(){
+  let hij=''; try{ hij=new Intl.DateTimeFormat('ar-SA-u-ca-islamic-umalqura',{day:'numeric',month:'long',year:'numeric'}).format(new Date()); }catch(e){}
+  $('#hdrDate').textContent = (settings.name? 'مرحباً '+settings.name+' — ':'') + hij;
+}
+
+function vHome(){
+  const d=tripDay(), plan=buildPlan(), s=smartNow(), c=CITIES[currentCity()];
+  const pt=prayerTimes(saudiNow(),c);
+  let dayCard='';
+  if(!settings.start){
+    dayCard=`<div class="card hero"><h2>ابدأ بإعداد رحلتك</h2><p class="muted">أدخل تاريخ بداية الرحلة ليرافقك التطبيق يوماً بيوم خلال ${AR(settings.days)} يوماً.</p>
+      <label>تاريخ الوصول</label><input type="date" id="qStart"><div style="height:8px"></div>
+      <button id="qSave">حفظ</button></div>`;
+  } else if(d<1){
+    dayCard=`<div class="card hero"><span class="pill gold">قبل السفر</span><div class="big">بقي ${AR(1-d)} يوماً</div><p class="muted">جهّز قائمة الأغراض، وحمّل تطبيق نسك، وتعلّم المناسك.</p><button class="btn light sm" data-go="more:pack">قائمة التجهيز</button></div>`;
+  } else if(d>plan.length){
+    dayCard=`<div class="card hero"><div class="big">تقبّل الله منكم 🤲</div><p class="muted">انتهت رحلتك. «آيبون تائبون عابدون لربنا حامدون».</p></div>`;
+  } else {
+    const p=plan[d-1];
+    dayCard=`<div class="card hero"><span class="pill gold">اليوم ${AR(d)} من ${AR(plan.length)} — ${p.city}</span>
+      <div class="big" style="font-size:22px;margin-top:6px">${esc(p.t)}</div><p>${esc(p.d)}</p>
+      <div style="background:#fff;border-radius:99px;height:10px;overflow:hidden"><div style="height:100%;width:${Math.round(d/plan.length*100)}%;background:var(--gold)"></div></div></div>`;
+  }
+  const h=saudiNow().getHours()+saudiNow().getMinutes()/60;
+  const nx=pt.filter(p=>p[0]!=='الشروق').find(p=>p[1]>h);
+  return `
+  ${dayCard}
+  <div class="card now-box"><h2>🧭 ماذا أفعل الآن؟</h2><p style="margin:0">${s.tip}</p>
+    <p class="muted" style="margin:6px 0 0">الصلاة القادمة: <b>${s.next}</b> بعد ${AR(Math.floor(s.mins/60))} س ${AR(s.mins%60)} د — ${s.city}</p></div>
+  <div class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">🕌 مواقيت الصلاة — ${c.n}</h2>
+      <button class="btn light sm" id="locBtn">📍 موقعي</button></div>
+    <div class="row" style="margin:6px 0"><button class="btn sm ${currentCity()==='mecca'?'':'light'}" data-city="mecca">مكة</button><button class="btn sm ${currentCity()==='medina'?'':'light'}" data-city="medina">المدينة</button></div>
+    ${pt.map(p=>`<div class="prayer ${nx&&nx[0]===p[0]?'next':''}"><span>${p[0]}</span><span>${fmtT(p[1])}</span></div>`).join('')}
+    <p class="muted">حساب تقريبي بتوقيت السعودية (طريقة أم القرى) — اعتمد على الأذان في الحرم.</p></div>
+  <div class="grid2">
+    <button class="btn" data-go="manasik">🕋 خطوات العمرة</button>
+    <button class="btn goldb" data-go="more:tasbih">📿 السبحة</button>
+    <button class="btn light" data-go="adhkar">🤲 الأدعية</button>
+    <button class="btn light" data-go="more:maps">🗺️ الخرائط</button>
+  </div>`;
+}
+
+function vManasik(){
+  const done=S.get('stepsDone',[]); const tw=S.get('tawaf',0), sa=S.get('sai',0);
+  return `<div class="card hero"><h2>صفة العمرة خطوة بخطوة</h2>
+    <p class="muted">أركان العمرة: الإحرام، الطواف، السعي. وواجباتها: الإحرام من الميقات، والحلق أو التقصير.</p>
+    <div class="pill">${AR(done.length)} / ${AR(STEPS.length)} خطوات مكتملة</div></div>
+  ${STEPS.map((s,i)=>`<div class="card"><div class="step ${done.includes(i)?'done':''}"><div class="num">${done.includes(i)?'✓':AR(i+1)}</div>
+    <div style="flex:1"><h2 style="margin:4px 0">${s.t}</h2>${s.body}
+    <button class="btn sm ${done.includes(i)?'light':''}" data-step="${i}">${done.includes(i)?'↺ إلغاء':'✓ أنهيت هذه الخطوة'}</button></div></div></div>`).join('')}
+  <div class="card"><h2>🔄 عدّاد الطواف</h2><p class="muted">اضغط عند كل مرور بمحاذاة الحجر الأسود.</p>
+    <div class="ring" id="twRing" style="--p:${tw/7*100}"><div class="n">${AR(tw)}</div><div class="muted">من ٧ أشواط</div></div>
+    <div class="row" style="justify-content:center"><button class="btn light sm" data-reset="tawaf">تصفير</button><button class="btn light sm" data-minus="tawaf">−١</button></div></div>
+  <div class="card"><h2>🚶 عدّاد السعي</h2><p class="muted">${sa%2===0?'أنت متجه الآن من الصفا ← إلى المروة':'أنت متجه الآن من المروة ← إلى الصفا'}</p>
+    <div class="ring" id="saRing" style="--p:${sa/7*100}"><div class="n">${AR(sa)}</div><div class="muted">من ٧ أشواط</div></div>
+    <div class="row" style="justify-content:center"><button class="btn light sm" data-reset="sai">تصفير</button><button class="btn light sm" data-minus="sai">−١</button></div></div>
+  <div class="card"><button class="btn danger sm" id="resetSteps">إعادة ضبط المناسك (لعمرة جديدة)</button></div>`;
+}
+
+function vAdhkar(){
+  const cats=Object.keys(ADHKAR), cur=sub.adhkar; const counts=S.get('dhikrCount',{});
+  let list = cur==='أدعيتي الخاصة' ? S.get('myDuas',[]).map(x=>({x, s:'دعاء خاص', mine:true})) : ADHKAR[cur];
+  return `<div class="tabs">${cats.map(c=>`<button class="${c===cur?'on':''}" data-cat="${c}">${c}</button>`).join('')}</div>
+  <div class="card">${cur==='أدعيتي الخاصة'?`<h2>أدعيتي ومن أوصاني بالدعاء</h2>
+     <textarea id="myDua" rows="2" placeholder="مثال: الدعاء لأمي بالشفاء، لفلان بالتوفيق…"></textarea><div style="height:6px"></div><button id="addDua" class="btn sm">+ إضافة</button>`:''}
+    ${list.length? list.map((a,i)=>{const k=cur+i, n=counts[k]||0, c=a.c||0;
+      return `<div class="dua">${c?`<button class="counter cnt ${n>=c?'done':''}" data-cnt="${esc(k)}" data-max="${c}">${AR(n)}/${AR(c)}</button>`:''}${esc(a.x)}<span class="src">${esc(a.s)}${a.mine?` · <a href="#" data-del="${i}" style="color:var(--red)">حذف</a>`:''}</span></div>`;}).join('') : '<p class="muted">لا شيء بعد.</p>'}
+    ${list.some(a=>a.c)?`<button class="btn light sm" data-rcnt="${esc(cur)}">تصفير العدّادات</button>`:''}</div>`;
+}
+
+function vPlaces(){
+  const c=sub.places;
+  return `<div class="tabs"><button class="${c==='mecca'?'on':''}" data-pc="mecca">مكة المكرمة</button><button class="${c==='medina'?'on':''}" data-pc="medina">المدينة المنورة</button></div>
+  <div class="card"><p class="muted" style="margin:0">⚠️ زيارة هذه الأماكن للتأمل والعبرة؛ لا يُتمسّح بالجدران والأحجار، ولا تُخصّ بعبادة لم ترد. اضغط «الخريطة» لفتح الاتجاهات.</p></div>
+  ${PLACES[c].map(p=>{const v=S.get('visited',{})[p.n];
+    return `<div class="card"><div class="place"><div class="em">${p.e}</div><div style="flex:1"><h2>${p.n}</h2><p style="margin:0 0 8px">${p.d}</p>
+    <div class="row"><a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.q)}">🗺️ الخريطة</a>
+    <button class="btn sm ${v?'goldb':'light'}" data-visit="${esc(p.n)}">${v?'✓ زُرته':'تمت الزيارة؟'}</button></div></div></div></div>`;}).join('')}`;
+}
+
+function vMore(){
+  const t=sub.more;
+  const tabs=[['plan','📅 برنامج الرحلة'],['tips','⭐ نصائح ذهبية'],['maps','🗺️ الخرائط'],['tasbih','📿 السبحة'],['pack','🎒 التجهيز'],['notes','📝 مذكرات'],['settings','⚙️ الإعدادات']];
+  let body='';
+  if(t==='plan'){ const plan=buildPlan(), d=tripDay();
+    body=`<div class="card"><h2>برنامج ${AR(plan.length)} يوماً</h2><p class="muted">برنامج مقترح قابل للتعديل من الإعدادات (عدد الأيام وترتيب المدينتين).</p>
+    ${plan.map((p,i)=>`<div class="day ${d===i+1?'today':''}"><b>اليوم ${AR(i+1)}${settings.start?' — '+dateOf(i):''}</b> <span class="pill">${p.city}</span><div>${esc(p.t)}</div><div class="muted">${esc(p.d)}</div></div>`).join('')}</div>`;
+  } else if(t==='tips'){
+    body=TIPS.map((x,i)=>`<div class="card"><h3>✨ ${AR(i+1)}. ${x[0]}</h3><p style="margin:0">${x[1]}</p></div>`).join('');
+  } else if(t==='maps'){
+    const city=S.get('mapCity','mecca'), q=city==='mecca'?'المسجد الحرام مكة':'المسجد النبوي المدينة المنورة';
+    body=`<div class="tabs"><button class="${city==='mecca'?'on':''}" data-mc="mecca">مكة</button><button class="${city==='medina'?'on':''}" data-mc="medina">المدينة</button></div>
+    <div class="card"><iframe class="map" loading="lazy" src="https://maps.google.com/maps?q=${encodeURIComponent(q)}&z=15&output=embed"></iframe>
+    <p class="muted">الخريطة تحتاج اتصالاً بالإنترنت.</p>
+    <div class="row"><a class="btn sm" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(q)}">فتح في خرائط Google</a>
+    <a class="btn light sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(q)}">🧭 الاتجاهات إلى الحرم</a></div></div>
+    <div class="card"><h2>📍 فندقي</h2><input id="hotel" placeholder="اسم الفندق أو العنوان" value="${esc(S.get('hotel_'+city,''))}"><div style="height:6px"></div>
+    <div class="row"><button class="btn sm" id="saveHotel">حفظ</button>${S.get('hotel_'+city,'')?`<a class="btn goldb sm" target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(S.get('hotel_'+city,''))}">🧭 أرجعني إلى الفندق</a>`:''}</div></div>`;
+  } else if(t==='tasbih'){
+    const n=S.get('tasbih',0), tg=S.get('tasbihTarget',33);
+    body=`<div class="card"><h2>📿 السبحة الإلكترونية</h2><div class="ring" id="tsRing" style="--p:${Math.min(100,(n%tg)/tg*100)}"><div class="n">${AR(n)}</div><div class="muted">الهدف ${AR(tg)}</div></div>
+    <div class="row" style="justify-content:center">${[33,100,1000].map(x=>`<button class="btn sm ${tg===x?'':'light'}" data-tg="${x}">${AR(x)}</button>`).join('')}<button class="btn danger sm" data-reset="tasbih">تصفير</button></div>
+    <p class="muted" style="text-align:center">اهتزاز عند إكمال كل ${AR(tg)}</p></div>`;
+  } else if(t==='pack'){
+    const ok=S.get('pack',{});
+    body=`<div class="card"><h2>🎒 قائمة التجهيز</h2>${PACK.map(p=>`<label class="check ${ok[p]?'ok':''}"><input type="checkbox" data-pack="${esc(p)}" ${ok[p]?'checked':''}><span>${p}</span></label>`).join('')}
+      <p class="muted">${AR(Object.values(ok).filter(Boolean).length)} / ${AR(PACK.length)} جاهز</p></div>`;
+  } else if(t==='notes'){
+    body=`<div class="card"><h2>📝 مذكرات الرحلة</h2><p class="muted">دوّن مشاعرك وما تعلّمته — تُحفظ على جهازك تلقائياً.</p><textarea id="notes" rows="12">${esc(S.get('notes',''))}</textarea></div>`;
+  } else if(t==='settings'){
+    body=`<div class="card"><h2>⚙️ الإعدادات</h2>
+      <label>اسمك</label><input id="sName" value="${esc(settings.name)}">
+      <label>تاريخ بداية الرحلة</label><input type="date" id="sStart" value="${settings.start}">
+      <div class="grid2"><div><label>مدة الرحلة (أيام)</label><input type="number" min="1" max="60" id="sDays" value="${settings.days}"></div>
+      <div><label>عدد الأيام في مكة</label><input type="number" min="0" max="60" id="sMecca" value="${settings.meccaDays}"></div></div>
+      <label>الترتيب</label><select id="sOrder"><option value="mecca" ${settings.order==='mecca'?'selected':''}>مكة أولاً ثم المدينة</option><option value="medina" ${settings.order==='medina'?'selected':''}>المدينة أولاً ثم مكة</option></select>
+      <label>المدينة الحالية لمواقيت الصلاة</label><select id="sCity"><option value="auto" ${settings.city==='auto'?'selected':''}>تلقائي (الموقع/البرنامج)</option><option value="mecca" ${settings.city==='mecca'?'selected':''}>مكة</option><option value="medina" ${settings.city==='medina'?'selected':''}>المدينة</option></select>
+      <label class="check"><input type="checkbox" id="sBig" ${settings.big?'checked':''}><span>تكبير خط الأذكار</span></label>
+      <div style="height:8px"></div><button id="sSave">حفظ الإعدادات</button></div>
+      <div class="card"><h2>📲 تثبيت التطبيق</h2><p class="muted">على أندرويد: قائمة المتصفح ⋮ ← «تثبيت التطبيق / إضافة إلى الشاشة الرئيسية». على آيفون: زر المشاركة ← «إضافة إلى الشاشة الرئيسية». يعمل بعدها بدون إنترنت.</p>
+      <button class="btn goldb sm hidden" id="installBtn">⬇️ تثبيت الآن</button></div>
+      <div class="card"><p class="muted">المحتوى للتعليم العام وفق ما عليه جمهور أهل العلم؛ في المسائل الخاصة اسأل أهل العلم الموثوقين. حساب مواقيت الصلاة تقريبي.</p></div>`;
+  }
+  return `<div class="tabs">${tabs.map(x=>`<button class="${x[0]===t?'on':''}" data-more="${x[0]}">${x[1]}</button>`).join('')}</div>${body}`;
+}
+function dateOf(i){ const d=new Date(settings.start+'T00:00:00'); d.setDate(d.getDate()+i); return d.toLocaleDateString('ar-MA',{weekday:'long',day:'numeric',month:'short'}); }
+
+/* ================== الأحداث ================== */
+function bind(){
+  const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
+  on('[data-go]','click',e=>{const [v,s]=e.currentTarget.dataset.go.split(':'); view=v; if(s) sub[v]=s; render();});
+  on('[data-city]','click',e=>{settings.city=e.currentTarget.dataset.city; saveSettings(); render();});
+  on('#locBtn','click',locate);
+  on('#qSave','click',()=>{const v=$('#qStart').value; if(v){settings.start=v; saveSettings(); render();}});
+  on('[data-step]','click',e=>{const i=+e.currentTarget.dataset.step; let d=S.get('stepsDone',[]); d=d.includes(i)?d.filter(x=>x!==i):[...d,i]; S.set('stepsDone',d); vib(30); if(d.length===STEPS.length) toast('تقبّل الله عمرتك 🤲'); render();});
+  on('#resetSteps','click',()=>{ if(confirm('إعادة ضبط كل خطوات العمرة والعدّادات؟')){S.set('stepsDone',[]);S.set('tawaf',0);S.set('sai',0);render();}});
+  const ringTap=(key,max,msg)=>()=>{let n=S.get(key,0); if(n>=max){toast(msg);return;} n++; S.set(key,n); vib(n===max?[100,60,100]:40); if(n===max) toast(msg); render();};
+  on('#twRing','click',ringTap('tawaf',7,'اكتمل الطواف ✓ — صلِّ ركعتين خلف المقام'));
+  on('#saRing','click',ringTap('sai',7,'اكتمل السعي ✓ — احلق أو قصّر'));
+  on('[data-reset]','click',e=>{S.set(e.currentTarget.dataset.reset,0); render();});
+  on('[data-minus]','click',e=>{const k=e.currentTarget.dataset.minus; S.set(k,Math.max(0,S.get(k,0)-1)); render();});
+  on('[data-cat]','click',e=>{sub.adhkar=e.currentTarget.dataset.cat; render();});
+  on('[data-cnt]','click',e=>{const b=e.currentTarget,k=b.dataset.cnt,m=+b.dataset.max,c=S.get('dhikrCount',{}); c[k]=Math.min(m,(c[k]||0)+1); S.set('dhikrCount',c); vib(c[k]===m?120:20);
+    b.textContent=AR(c[k])+'/'+AR(m); b.classList.toggle('done',c[k]>=m);});
+  on('[data-rcnt]','click',e=>{const p=e.currentTarget.dataset.rcnt,c=S.get('dhikrCount',{}); Object.keys(c).forEach(k=>{if(k.startsWith(p))delete c[k];}); S.set('dhikrCount',c); render();});
+  on('#addDua','click',()=>{const v=$('#myDua').value.trim(); if(!v)return; const a=S.get('myDuas',[]); a.push(v); S.set('myDuas',a); render();});
+  on('[data-del]','click',e=>{e.preventDefault(); const a=S.get('myDuas',[]); a.splice(+e.currentTarget.dataset.del,1); S.set('myDuas',a); render();});
+  on('[data-pc]','click',e=>{sub.places=e.currentTarget.dataset.pc; render();});
+  on('[data-visit]','click',e=>{const v=S.get('visited',{}),n=e.currentTarget.dataset.visit; v[n]=!v[n]; S.set('visited',v); render();});
+  on('[data-more]','click',e=>{sub.more=e.currentTarget.dataset.more; render();});
+  on('[data-mc]','click',e=>{S.set('mapCity',e.currentTarget.dataset.mc); render();});
+  on('#saveHotel','click',()=>{S.set('hotel_'+S.get('mapCity','mecca'),$('#hotel').value.trim()); toast('تم الحفظ'); render();});
+  on('#tsRing','click',()=>{const n=S.get('tasbih',0)+1,tg=S.get('tasbihTarget',33); S.set('tasbih',n); vib(n%tg===0?[120,60,120]:15); render();});
+  on('[data-tg]','click',e=>{S.set('tasbihTarget',+e.currentTarget.dataset.tg); render();});
+  on('[data-pack]','change',e=>{const o=S.get('pack',{}); o[e.currentTarget.dataset.pack]=e.currentTarget.checked; S.set('pack',o); render();});
+  on('#notes','input',e=>S.set('notes',e.currentTarget.value));
+  on('#sSave','click',()=>{Object.assign(settings,{name:$('#sName').value.trim(),start:$('#sStart').value,days:+$('#sDays').value||15,meccaDays:+$('#sMecca').value||0,order:$('#sOrder').value,city:$('#sCity').value,big:$('#sBig').checked}); saveSettings(); hdr(); toast('تم حفظ الإعدادات ✓'); render();});
+  if(deferredPrompt){ const b=$('#installBtn'); if(b){ b.classList.remove('hidden'); b.onclick=()=>{deferredPrompt.prompt(); deferredPrompt=null;}; } }
+}
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>{view=b.dataset.v; render();}));
+
+/* ================== PWA ================== */
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{e.preventDefault(); deferredPrompt=e;});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')){ navigator.serviceWorker.register('sw.js').catch(()=>{}); }
+
+hdr(); render();
+setInterval(()=>{ if(view==='home' && !document.activeElement.matches('input,textarea,select')) render(); }, 60000);
+</script>
+</body>
+</html>
