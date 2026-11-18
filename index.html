@@ -604,6 +604,40 @@ function stays(){
   return a;
 }
 const L=(href,txt,cls='light')=>`<a class="btn ${cls} sm" target="_blank" rel="noopener" href="${href}">${txt}</a>`;
+
+/* ===== نتائج البحث في مواقع الطيران (تُحدَّث يدوياً عند كل بحث جديد) ===== */
+const FL_DATE='18 نونبر 2026';
+const FLIGHT_OPTIONS=[
+  {r:'الدار البيضاء ⇄ جدة', from:'CMN', to:'JED', al:'الخطوط الملكية المغربية (RAM)', code:'AT', type:'مباشر', direct:true, freq:'رحلات منتظمة، المدة نحو 6 ساعات', price:'ذهاب وإياب من 7 589 درهم للشخص (فترة 1–12 دجنبر 2026، حسب موقع الشركة)', url:'https://www.royalairmaroc.com/ma-ar', ppp:7589},
+  {r:'الدار البيضاء ⇄ جدة', from:'CMN', to:'JED', al:'الخطوط السعودية (Saudia)', code:'SV', type:'مباشر', direct:true, freq:'نحو 9 رحلات أسبوعياً، المدة نحو 6 ساعات و10 دقائق', price:'قارن السعر على الموقع وفي Google Flights', url:'https://www.saudia.com/ar-ma'},
+  {r:'الدار البيضاء ⇄ جدة', from:'CMN', to:'JED', al:'طيران ناس (flynas) — اقتصادي', code:'XY', type:'مباشر', direct:true, freq:'3 رحلات أسبوعياً', price:'غالباً الأرخص، لكن الأمتعة المسجّلة بثمن إضافي', url:'https://www.flynas.com/ar'},
+  {r:'الدار البيضاء ⇄ المدينة', from:'CMN', to:'MED', al:'الخطوط الملكية المغربية (RAM)', code:'AT', type:'مباشر', direct:true, freq:'نحو رحلة واحدة أسبوعياً، المدة نحو 6 ساعات — خطّط مبكراً', price:'ذهاب وإياب من نحو 773 يورو للشخص (12–18 دجنبر 2026)', url:'https://www.royalairmaroc.com/ma-ar'},
+  {r:'فاس ← جدة', from:'FEZ', to:'JED', al:'RAM عبر الدار البيضاء', code:'AT', type:'توقف واحد', direct:false, freq:'لا توجد رحلات مباشرة من فاس سايس', price:'يناير غالباً أرخص شهر على هذا الخط', url:'https://www.royalairmaroc.com/ma-ar'},
+  {r:'فاس/الدار البيضاء ← جدة', from:'CMN', to:'JED', al:'الخطوط التركية / القطرية', code:'', type:'توقف (إسطنبول/الدوحة)', direct:false, freq:'رحلة أطول بكثير', price:'قد تكون أرخص في بعض التواريخ — قارن في Google Flights', url:''}
+];
+const FL_TIPS=[
+  'الأقرب لأزرو مع رحلات مباشرة: <b>الدار البيضاء (CMN)</b>. من فاس ستتوقف غالباً في الدار البيضاء على أي حال.',
+  'المواقع تختلف حول دجنبر: بعضها يراه أرخص شهر، وبعضها يراه الأغلى (عطلة نهاية السنة). قارن أوائل دجنبر بأواسط يناير.',
+  'إن بدأت بالمدينة: رحلة RAM المباشرة إلى المدينة أسبوعية، فاضبط برنامجك على يومها.',
+  'أسعار طيران ناس تبدو أقل، أضف إليها ثمن الأمتعة (وزمزم) قبل المقارنة.',
+  'احجز تذكرة ذهاب وإياب واحدة، أو «متعددة المدن» (الوصول لجدة والعودة من المدينة) لتوفير الطريق.'
+];
+let flTab='plan';
+function apOpts(v){ const all={...Object.fromEntries(Object.entries(AIRPORTS).map(([k,x])=>[k,x.city])),JED:'جدة',MED:'المدينة',TIF:'الطائف'};
+  return Object.entries(all).map(([k,n])=>`<option value="${k}" ${v===k?'selected':''}>${n} (${k})</option>`).join(''); }
+function leaveAzrou(f){ if(!f||!f.dep||!AIRPORTS[f.from]) return '';
+  const h={FEZ:1.5,CMN:4.5,RBA:3.5,RAK:6.5}[f.from]; const [H,M]=f.dep.split(':').map(Number); let t=H+M/60-3-h;
+  return fmtT(fix(t,24))+(t<0?' (اليوم السابق)':''); }
+function flightSummary(){
+  const F=S.get('myFlights',{}), o=F.out||{}, r=F.ret||{}; if(!o.date&&!r.date) return '';
+  const days=d=>{ if(!d) return null; const x=new Date(d+'T00:00:00'), n=new Date(); n.setHours(0,0,0,0); return Math.round((x-n)/864e5); };
+  const line=(f,ic)=>f.date?`<div class="prayer"><span>${ic} ${esc(f.al||'')} ${esc(f.no||'')} — ${f.from||''} → ${f.to||''}</span><span dir="ltr">${f.date.split('-').reverse().join('/')} ${f.dep||''}</span></div>`:'';
+  const d=days(o.date); const lv=leaveAzrou(o);
+  return `<div class="card hero"><h2>✈️ رحلتي</h2>${line(o,'🛫')}${line(r,'🛬')}
+    ${d!==null&&d>=0?`<p style="margin:6px 0 0"><b>${d===0?'رحلتك اليوم!':'بقي '+d+' يوماً على الإقلاع'}</b>${lv&&d<=1?` — اخرج من أزرو قبل <b>${lv}</b>`:''}</p>`:''}
+    ${lv&&(d===null||d>1)?`<p class="muted" style="margin:0">🕰️ يوم السفر: اخرج من أزرو قبل ${lv}</p>`:''}
+    ${o.pnr?`<p class="muted" style="margin:0">رقم الحجز: <b dir="ltr">${esc(o.pnr)}</b></p>`:''}</div>`;
+}
 let travelTab='flights';
 function vTravel(){
   if(!T.out && settings.start) T.out=settings.start;
@@ -611,25 +645,66 @@ function vTravel(){
   const tabs=[['flights','✈️ الطيران'],['bus','🚌 من أزرو للمطار'],['hotels','🏨 الفنادق'],['ksa','🚄 التنقل في السعودية']];
   let b='';
   if(travelTab==='flights'){
-    const q=`Flights from ${T.from} to ${T.to} on ${T.out} through ${T.ret}`;
-    const gf=`https://www.google.com/travel/flights?hl=ar&q=${encodeURIComponent(q+' '+T.adults+' adults')}`;
+    const F=S.get('myFlights',{out:{},ret:{}});
+    const leg=(k,title,def)=>{const f=Object.assign({},def,F[k]||{});
+      return `<div class="card"><h2>${title}</h2>
+      <div class="grid2"><div><label>شركة الطيران</label><input data-f="${k}.al" value="${esc(f.al||'')}" placeholder="مثال: RAM"></div>
+      <div><label>رقم الرحلة</label><input data-f="${k}.no" value="${esc(f.no||'')}" placeholder="AT248" dir="ltr"></div>
+      <div><label>من</label><select data-f="${k}.from">${apOpts(f.from)}</select></div>
+      <div><label>إلى</label><select data-f="${k}.to">${apOpts(f.to)}</select></div>
+      <div><label>التاريخ</label><input type="date" data-f="${k}.date" value="${f.date||''}"></div>
+      <div><label>الإقلاع (التوقيت المحلي)</label><input type="time" data-f="${k}.dep" value="${f.dep||''}"></div>
+      <div><label>الوصول</label><input type="time" data-f="${k}.arr" value="${f.arr||''}"></div>
+      <div><label>رقم الحجز (PNR)</label><input data-f="${k}.pnr" value="${esc(f.pnr||'')}" dir="ltr"></div>
+      <div><label>الثمن للشخص (درهم)</label><input type="number" data-f="${k}.price" value="${f.price||''}"></div>
+      <div><label>التوقف</label><select data-f="${k}.stop">${['مباشر','توقف واحد','توقفان'].map(x=>`<option ${f.stop===x?'selected':''}>${x}</option>`).join('')}</select></div></div></div>`;};
+    const opt=(o,i)=>`<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">${o.r}</h3><span class="pill ${o.direct?'':'gold'}">${o.type}</span></div>
+      <div><b>${o.al}</b></div><div class="muted">${o.freq}</div><div>💰 ${o.price}</div>
+      <div class="row" style="margin-top:6px"><button class="btn sm" data-pick="${i}">✓ اعتمد هذا الخيار في خطتي</button>${o.url?L(o.url,'الموقع'):''}</div></div>`;
+    const out=F.out||{}, ret=F.ret||{};
+    const q1=`Flights from ${T.from} to ${T.to} on ${T.out} through ${T.ret}`;
+    const qOJ=`Flights from ${T.from} to ${T.to} on ${T.out} and from ${T.back} to ${T.from} on ${T.ret}`;
+    const gf=q=>`https://www.google.com/travel/flights?hl=ar&q=${encodeURIComponent(q+' '+T.adults+' adults')}`;
     const sky=`https://www.skyscanner.net/transport/flights/${T.from.toLowerCase()}/${T.to.toLowerCase()}/${yymmdd(T.out)}/${yymmdd(T.ret)}/?adultsv2=${T.adults}`;
     const kayak=`https://www.kayak.com/flights/${T.from}-${T.to}/${T.out}/${T.ret}/${T.adults}adults`;
-    b=`<div class="card"><h2>✈️ البحث عن رحلة طيران</h2>
+    const kayakOJ=`https://www.kayak.com/flights/${T.from}-${T.to}/${T.out}/${T.back}-${T.from}/${T.ret}/${T.adults}adults`;
+    b=`<div class="tabs">${[['plan','🗓️ خطتي (ذهاب وإياب)'],['opts','📋 خيارات وجدتها'],['search','🔎 بحث مباشر'],['budget','💰 الميزانية']].map(x=>`<button class="${x[0]===flTab?'on':''}" data-fl="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+    if(flTab==='plan'){
+      b+=`${flightSummary()}
+      ${leg('out','🛫 الذهاب',{from:T.from,to:T.to,date:T.out})}
+      ${leg('ret','🛬 الإياب',{from:T.back,to:T.from,date:T.ret})}
+      <div class="card"><button class="btn sm" id="flSave">💾 حفظ الخطة</button> <button class="btn light sm" id="flSync">↻ ضبط برنامج الأيام على تاريخ الوصول</button>
+      <p class="muted">💡 جدة توقيتها متقدم بساعتين على المغرب. إن وصلت جدة ورجعت من المدينة (أو العكس) وفّرت طريق الرجوع بين المدينتين.</p></div>`;
+    } else if(flTab==='opts'){
+      b+=`<div class="card warn" style="border-radius:var(--r)">🔎 نتائج بحثي في مواقع الطيران بتاريخ <b>${FL_DATE}</b> لفترة دجنبر 2026 – يناير 2027. الأسعار تتغيّر يومياً، فتحقق منها قبل الحجز.</div>
+      ${FLIGHT_OPTIONS.map(opt).join('')}
+      <div class="card"><h3>💡 خلاصة</h3><ul class="clean">${FL_TIPS.map(t=>`<li>${t}</li>`).join('')}</ul></div>`;
+    } else if(flTab==='search'){
+      b+=`<div class="card"><h2>🔎 البحث في المنصات</h2>
       <label>مطار الانطلاق</label><select id="tFrom">${Object.entries(AIRPORTS).map(([k,v])=>`<option value="${k}" ${T.from===k?'selected':''}>${v.n} (${k})</option>`).join('')}</select>
       <p class="muted" style="margin:2px 0 6px">📍 ${AIRPORTS[T.from].km}</p>
-      <label>الوجهة</label><select id="tTo">${Object.entries(DESTS).map(([k,v])=>`<option value="${k}" ${T.to===k?'selected':''}>${v} (${k})</option>`).join('')}</select>
-      <div class="grid2"><div><label>الذهاب</label><input type="date" id="tOut" value="${T.out}"></div><div><label>العودة</label><input type="date" id="tRet" value="${T.ret}"></div></div>
+      <div class="grid2"><div><label>الوصول إلى</label><select id="tTo">${Object.entries(DESTS).map(([k,v])=>`<option value="${k}" ${T.to===k?'selected':''}>${k}</option>`).join('')}</select></div>
+      <div><label>العودة من</label><select id="tBack">${Object.entries(DESTS).map(([k,v])=>`<option value="${k}" ${T.back===k?'selected':''}>${k}</option>`).join('')}</select></div>
+      <div><label>الذهاب</label><input type="date" id="tOut" value="${T.out}"></div><div><label>الإياب</label><input type="date" id="tRet" value="${T.ret}"></div></div>
       <label>عدد المسافرين</label><input type="number" min="1" max="9" id="tAd" value="${T.adults}">
       <div style="height:8px"></div><button id="tSave" class="btn sm">تحديث البحث</button>
-      ${T.out&&T.ret?`<div class="links">${L(gf,'🔎 Google Flights','')}${L(sky,'🔎 Skyscanner','')}${L(kayak,'🔎 Kayak')}${L('https://www.royalairmaroc.com/ma-ar','الخطوط الملكية المغربية')}${L('https://www.saudia.com/ar-ma','الخطوط السعودية')}${L('https://www.flynas.com/ar','طيران ناس')}</div>`:'<p class="warn" style="margin-top:8px">اختر تاريخي الذهاب والعودة لتظهر نتائج البحث.</p>'}
-      </div>
-      <div class="card"><h3>💡 نصائح للحجز</h3><ul class="clean">
-        <li>الرحلات المباشرة إلى جدة تنطلق غالباً من <b>الدار البيضاء</b>؛ من فاس قد تكون بتوقف — قارن السعر مع كلفة التنقل إلى الدار البيضاء.</li>
-        <li>إن بدأت بالمدينة احجز إلى <b>MED</b> مباشرة وتحرم من ذي الحليفة.</li>
-        <li>الإحرام قبل الإقلاع إن كانت الرحلة إلى جدة (الميقات يُحاذى في الجو).</li>
-        <li>تأكد من وزن الأمتعة المسموح (زمزم يُشحن غالباً في عبوة 5 لترات مختومة).</li>
-        <li>التأشيرة: تأشيرة العمرة أو السياحية عبر المنصات الرسمية (نسك / التأشيرة الإلكترونية) أو وكالة معتمدة.</li></ul></div>`;
+      ${T.out&&T.ret?(T.to===T.back?`<div class="links">${L(gf(q1),'Google Flights','')}${L(sky,'Skyscanner','')}${L(kayak,'Kayak')}${L('https://www.royalairmaroc.com/ma-ar','RAM')}${L('https://www.saudia.com/ar-ma','السعودية')}${L('https://www.flynas.com/ar','طيران ناس')}</div>`
+        :`<p class="muted">رحلة متعددة المدن: ${T.from} ← ${T.to} ثم ${T.back} ← ${T.from}</p><div class="links">${L(gf(qOJ),'Google Flights','')}${L(kayakOJ,'Kayak','')}${L('https://www.royalairmaroc.com/ma-ar','RAM')}${L('https://www.saudia.com/ar-ma','السعودية')}</div>`)
+        :'<p class="warn" style="margin-top:8px">اختر تاريخي الذهاب والإياب.</p>'}</div>`;
+    } else {
+      const B=S.get('budget',{}), n=+T.adults||1;
+      const fl=((+out.price||0)+(+ret.price||0))*n;
+      const items=[['visa','التأشيرة'],['hmecca','فندق مكة'],['hmed','فندق المدينة'],['trans','التنقل (أزرو↔المطار، القطار…)'],['food','الأكل'],['gifts','الهدايا'],['other','أخرى']];
+      const spent=fl+items.reduce((a,[k])=>a+(+B[k]||0),0), tot=+B.total||0;
+      b+=`<div class="card"><h2>💰 ميزانية الرحلة (درهم)</h2>
+        <label>الميزانية الإجمالية</label><input type="number" data-b="total" value="${B.total||''}" placeholder="المبلغ الكلي لكل المسافرين">
+        <div class="prayer"><span>✈️ الطيران (${n} مسافر — من «خطتي»)</span><b>${fl.toLocaleString('fr-FR')}</b></div>
+        ${items.map(([k,t])=>`<div class="grid2" style="margin:4px 0"><label style="align-self:center">${t}</label><input type="number" data-b="${k}" value="${B[k]||''}"></div>`).join('')}
+        <div class="prayer next"><span>المجموع</span><span>${spent.toLocaleString('fr-FR')}</span></div>
+        ${tot?`<div class="prayer" style="color:${tot-spent<0?'var(--red)':'var(--green)'}"><span>${tot-spent<0?'⚠️ تجاوز':'✓ المتبقي'}</span><b>${Math.abs(tot-spent).toLocaleString('fr-FR')}</b></div>
+        <div style="background:var(--green3);border-radius:99px;height:10px;overflow:hidden"><div style="height:100%;width:${Math.min(100,spent/tot*100)}%;background:${spent>tot?'var(--red)':'var(--gold)'}"></div></div>`:''}
+        <div style="height:8px"></div><button class="btn sm" id="bSave">💾 حفظ</button></div>`;
+    }
   } else if(travelTab==='bus'){
     const ap=AIRPORTS[T.from];
     const dir=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Azrou, Morocco')}&destination=${encodeURIComponent(ap.n)}&travelmode=transit`;
@@ -708,6 +783,7 @@ function vHome(){
   const h=saudiNow().getHours()+saudiNow().getMinutes()/60;
   const nx=pt.filter(p=>p[0]!=='الشروق').find(p=>p[1]>h);
   return `
+  ${(d===null||d<1)?flightSummary():''}
   ${dayCard}
   <div class="card now-box"><h2>🧭 ماذا أفعل الآن؟</h2><p style="margin:0">${s.tip}</p>
     <p class="muted" style="margin:6px 0 0">الصلاة القادمة: <b>${s.next}</b> بعد ${AR(Math.floor(s.mins/60))} س ${AR(s.mins%60)} د — ${s.city}</p></div>
@@ -857,6 +933,18 @@ function bind(){
   on('[data-pack]','change',e=>{const o=S.get('pack',{}); o[e.currentTarget.dataset.pack]=e.currentTarget.checked; S.set('pack',o); render();});
   on('#notes','input',e=>S.set('notes',e.currentTarget.value));
   on('#sSave','click',()=>{Object.assign(settings,{name:$('#sName').value.trim(),start:$('#sStart').value,days:+$('#sDays').value||15,meccaDays:+$('#sMecca').value||0,order:$('#sOrder').value,city:$('#sCity').value,big:$('#sBig').checked}); saveSettings(); hdr(); toast('تم حفظ الإعدادات ✓'); render();});
+  on('[data-fl]','click',e=>{flTab=e.currentTarget.dataset.fl; render();});
+  on('#tBack','change',e=>{T.back=e.currentTarget.value; saveT(); render();});
+  const readFlights=()=>{const F=S.get('myFlights',{out:{},ret:{}}); document.querySelectorAll('[data-f]').forEach(el=>{const [k,f]=el.dataset.f.split('.'); F[k]=F[k]||{}; F[k][f]=el.value;}); return F;};
+  on('#flSave','click',()=>{S.set('myFlights',readFlights()); toast('تم حفظ خطة الطيران ✓'); render();});
+  on('#flSync','click',()=>{const F=readFlights(); S.set('myFlights',F); if(F.out&&F.out.date){ settings.start=F.out.date;
+      if(F.ret&&F.ret.date){ settings.days=Math.max(1,Math.round((new Date(F.ret.date)-new Date(F.out.date))/864e5)+1); }
+      settings.order=(F.out.to==='MED')?'medina':'mecca'; saveSettings(); T.out=F.out.date; if(F.ret) T.ret=F.ret.date||T.ret; saveT(); toast('تم ضبط البرنامج على رحلتك ✓'); render(); } else toast('أدخل تاريخ الذهاب أولاً'); });
+  on('[data-pick]','click',e=>{const o=FLIGHT_OPTIONS[+e.currentTarget.dataset.pick], F=S.get('myFlights',{out:{},ret:{}});
+    F.out=Object.assign(F.out||{},{al:o.al.split(' (')[0],from:o.from,to:o.to,stop:o.direct?'مباشر':'توقف واحد',price:o.ppp||F.out.price||''});
+    F.ret=Object.assign(F.ret||{},{al:o.al.split(' (')[0],from:o.to,to:o.from,stop:o.direct?'مباشر':'توقف واحد'});
+    S.set('myFlights',F); flTab='plan'; toast('أُضيف إلى خطتك — أكمل التواريخ والأوقات'); render();});
+  on('#bSave','click',()=>{const B=S.get('budget',{}); document.querySelectorAll('[data-b]').forEach(el=>B[el.dataset.b]=el.value); S.set('budget',B); toast('تم الحفظ ✓'); render();});
   on('[data-tt]','click',e=>{travelTab=e.currentTarget.dataset.tt; render();});
   on('#tFrom','change',e=>{T.from=e.currentTarget.value; saveT(); render();});
   on('#tTo','change',e=>{T.to=e.currentTarget.value; saveT(); render();});
