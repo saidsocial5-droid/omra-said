@@ -608,6 +608,7 @@ const L=(href,txt,cls='light')=>`<a class="btn ${cls} sm" target="_blank" rel="n
 /* ===== نتائج البحث في مواقع الطيران (تُحدَّث يدوياً عند كل بحث جديد) ===== */
 const FL_DATE='18 نونبر 2026';
 const FLIGHT_OPTIONS=[
+  {r:'الرباط ⇄ جدة', from:'RBA', to:'JED', al:'طيران ناس (flynas) — XY672 / XY671', code:'XY', type:'مباشر', direct:true, freq:'رحلة واحدة أسبوعياً في كل اتجاه، المدة نحو 6 ساعات و40 دقيقة ذهاباً و7 ساعات إياباً', price:'✅ هذه رحلتك المختارة', url:'https://www.flynas.com/ar'},
   {r:'الدار البيضاء ⇄ جدة', from:'CMN', to:'JED', al:'الخطوط الملكية المغربية (RAM)', code:'AT', type:'مباشر', direct:true, freq:'رحلات منتظمة، المدة نحو 6 ساعات', price:'ذهاب وإياب من 7 589 درهم للشخص (فترة 1–12 دجنبر 2026، حسب موقع الشركة)', url:'https://www.royalairmaroc.com/ma-ar', ppp:7589},
   {r:'الدار البيضاء ⇄ جدة', from:'CMN', to:'JED', al:'الخطوط السعودية (Saudia)', code:'SV', type:'مباشر', direct:true, freq:'نحو 9 رحلات أسبوعياً، المدة نحو 6 ساعات و10 دقائق', price:'قارن السعر على الموقع وفي Google Flights', url:'https://www.saudia.com/ar-ma'},
   {r:'الدار البيضاء ⇄ جدة', from:'CMN', to:'JED', al:'طيران ناس (flynas) — اقتصادي', code:'XY', type:'مباشر', direct:true, freq:'3 رحلات أسبوعياً', price:'غالباً الأرخص، لكن الأمتعة المسجّلة بثمن إضافي', url:'https://www.flynas.com/ar'},
@@ -622,6 +623,27 @@ const FL_TIPS=[
   'أسعار طيران ناس تبدو أقل، أضف إليها ثمن الأمتعة (وزمزم) قبل المقارنة.',
   'احجز تذكرة ذهاب وإياب واحدة، أو «متعددة المدن» (الوصول لجدة والعودة من المدينة) لتوفير الطريق.'
 ];
+
+/* ===== رحلة سعيد المؤكدة (تُطبَّق تلقائياً على الهاتف عند التحديث) ===== */
+const MY_TRIP = {
+  v: 'trip-2026-11-19a',
+  adults: 2,
+  out: { al:'طيران ناس (flynas)', no:'XY672', from:'RBA', to:'JED', stop:'مباشر', date:'', dep:'', arr:'' },
+  ret: { al:'طيران ناس (flynas)', no:'XY671', from:'JED', to:'RBA', stop:'مباشر', date:'', dep:'', arr:'' }
+};
+function applyTrip(){
+  try{
+    if(S.get('tripPreset','')===MY_TRIP.v) return;
+    const F=S.get('myFlights',{out:{},ret:{}});
+    ['out','ret'].forEach(k=>{ F[k]=F[k]||{}; Object.entries(MY_TRIP[k]).forEach(([f,v])=>{ if(v!=='' ) F[k][f]=v; }); });
+    S.set('myFlights',F);
+    T.from=MY_TRIP.out.from; T.to=MY_TRIP.out.to; T.back=MY_TRIP.ret.from; T.adults=MY_TRIP.adults;
+    if(MY_TRIP.out.date){ T.out=MY_TRIP.out.date; settings.start=MY_TRIP.out.date; }
+    if(MY_TRIP.ret.date){ T.ret=MY_TRIP.ret.date; if(MY_TRIP.out.date) settings.days=Math.max(1,Math.round((new Date(MY_TRIP.ret.date)-new Date(MY_TRIP.out.date))/864e5)+1); }
+    settings.order = MY_TRIP.out.to==='MED' ? 'medina' : 'mecca';
+    saveT(); saveSettings(); S.set('tripPreset',MY_TRIP.v);
+  }catch(e){}
+}
 let flTab='plan';
 function apOpts(v){ const all={...Object.fromEntries(Object.entries(AIRPORTS).map(([k,x])=>[k,x.city])),JED:'جدة',MED:'المدينة',TIF:'الطائف'};
   return Object.entries(all).map(([k,n])=>`<option value="${k}" ${v===k?'selected':''}>${n} (${k})</option>`).join(''); }
@@ -974,7 +996,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   }).catch(()=>{});
 }
 
-hdr(); render();
+applyTrip(); hdr(); render();
 setInterval(()=>{ if(view==='home' && !document.activeElement.matches('input,textarea,select')) render(); }, 60000);
 </script>
 </body>
