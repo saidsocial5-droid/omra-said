@@ -2,7 +2,7 @@
    الإصدار يُستبدل تلقائياً عند كل نشر عبر GitHub Actions */
 const VERSION = '__BUILD__';
 const CACHE = 'omra-said-' + VERSION;
-const FILES = ['./', './index.html', './manifest.json', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './telecom.json'];
+const FILES = ['./', './index.html', './manifest.json', './icons/icon.svg', './icons/icon-192.png', './icons/icon-512.png', './telecom.json', './flights.json'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES.map(f => new Request(f, {cache: 'reload'})))));

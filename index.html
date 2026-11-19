@@ -626,7 +626,7 @@ const FL_TIPS=[
 
 /* ===== رحلة سعيد المؤكدة (تُطبَّق تلقائياً على الهاتف عند التحديث) ===== */
 const MY_TRIP = {
-  v: 'trip-2026-11-19a',
+  v: 'trip-2026-11-19b',
   adults: 2,
   out: { al:'طيران ناس (flynas)', no:'XY672', from:'RBA', to:'JED', stop:'مباشر', date:'', dep:'', arr:'' },
   ret: { al:'طيران ناس (flynas)', no:'XY671', from:'JED', to:'RBA', stop:'مباشر', date:'', dep:'', arr:'' }
@@ -636,6 +636,7 @@ function applyTrip(){
     if(S.get('tripPreset','')===MY_TRIP.v) return;
     const F=S.get('myFlights',{out:{},ret:{}});
     ['out','ret'].forEach(k=>{ F[k]=F[k]||{}; Object.entries(MY_TRIP[k]).forEach(([f,v])=>{ if(v!=='' ) F[k][f]=v; }); });
+    ['out','ret'].forEach(k=>{ const db=FLDB.flights[(F[k].no||'').toUpperCase()]; if(db){ ['al','from','to','dep','arr'].forEach(f=>{ if(!F[k][f] || f==='dep'||f==='arr') F[k][f]=db[f]; }); } });
     S.set('myFlights',F);
     T.from=MY_TRIP.out.from; T.to=MY_TRIP.out.to; T.back=MY_TRIP.ret.from; T.adults=MY_TRIP.adults;
     if(MY_TRIP.out.date){ T.out=MY_TRIP.out.date; settings.start=MY_TRIP.out.date; }
@@ -644,7 +645,7 @@ function applyTrip(){
     saveT(); saveSettings(); S.set('tripPreset',MY_TRIP.v);
   }catch(e){}
 }
-let flTab='plan';
+let flTab='lookup';
 function apOpts(v){ const all={...Object.fromEntries(Object.entries(AIRPORTS).map(([k,x])=>[k,x.city])),JED:'جدة',MED:'المدينة',TIF:'الطائف'};
   return Object.entries(all).map(([k,n])=>`<option value="${k}" ${v===k?'selected':''}>${n} (${k})</option>`).join(''); }
 function leaveAzrou(f){ if(!f||!f.dep||!AIRPORTS[f.from]) return '';
@@ -664,7 +665,7 @@ let travelTab='flights';
 function vTravel(){
   if(!T.out && settings.start) T.out=settings.start;
   if(!T.ret && settings.start) T.ret=addDays(settings.start,(+settings.days||15)-1);
-  const tabs=[['flights','✈️ الطيران'],['bus','🚌 من أزرو للمطار'],['hotels','🏨 الفنادق'],['ksa','🚄 التنقل في السعودية']];
+  const tabs=[['flights','✈️ الطيران'],['airport','🛂 خطوات المطار'],['bus','🚌 من أزرو للمطار'],['hotels','🏨 الفنادق'],['ksa','🚄 التنقل في السعودية']];
   let b='';
   if(travelTab==='flights'){
     const F=S.get('myFlights',{out:{},ret:{}});
@@ -690,8 +691,9 @@ function vTravel(){
     const sky=`https://www.skyscanner.net/transport/flights/${T.from.toLowerCase()}/${T.to.toLowerCase()}/${yymmdd(T.out)}/${yymmdd(T.ret)}/?adultsv2=${T.adults}`;
     const kayak=`https://www.kayak.com/flights/${T.from}-${T.to}/${T.out}/${T.ret}/${T.adults}adults`;
     const kayakOJ=`https://www.kayak.com/flights/${T.from}-${T.to}/${T.out}/${T.back}-${T.from}/${T.ret}/${T.adults}adults`;
-    b=`<div class="tabs">${[['plan','🗓️ خطتي (ذهاب وإياب)'],['opts','📋 خيارات وجدتها'],['search','🔎 بحث مباشر'],['budget','💰 الميزانية']].map(x=>`<button class="${x[0]===flTab?'on':''}" data-fl="${x[0]}">${x[1]}</button>`).join('')}</div>`;
-    if(flTab==='plan'){
+    b=`<div class="tabs">${[['lookup','🔎 برقم الرحلة'],['plan','🗓️ خطتي (ذهاب وإياب)'],['opts','📋 خيارات وجدتها'],['search','🔎 بحث مباشر'],['budget','💰 الميزانية']].map(x=>`<button class="${x[0]===flTab?'on':''}" data-fl="${x[0]}">${x[1]}</button>`).join('')}</div>`;
+    if(flTab==='lookup'){ b+=vLookup(); }
+    else if(flTab==='plan'){
       b+=`${flightSummary()}
       ${leg('out','🛫 الذهاب',{from:T.from,to:T.to,date:T.out})}
       ${leg('ret','🛬 الإياب',{from:T.back,to:T.from,date:T.ret})}
@@ -727,6 +729,7 @@ function vTravel(){
         <div style="background:var(--green3);border-radius:99px;height:10px;overflow:hidden"><div style="height:100%;width:${Math.min(100,spent/tot*100)}%;background:${spent>tot?'var(--red)':'var(--gold)'}"></div></div>`:''}
         <div style="height:8px"></div><button class="btn sm" id="bSave">💾 حفظ</button></div>`;
     }
+  } else if(travelTab==='airport'){ b=vAirport();
   } else if(travelTab==='bus'){
     const ap=AIRPORTS[T.from];
     const dir=`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent('Azrou, Morocco')}&destination=${encodeURIComponent(ap.n)}&travelmode=transit`;
@@ -813,6 +816,160 @@ function vTelecom(){
     <p class="muted" style="margin:0">المصادر: ${TEL.sources.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${esc(x.t)}</a>`).join(' · ')}</p></div>`;
 }
 
+/* ================== قاعدة مواعيد الرحلات (flights.json — تُحدَّث تلقائياً مرتين أسبوعياً) ================== */
+const FL_SEED={"updated":"2026-11-19","note":"مواعيد مجدولة بالتوقيت المحلي لكل مطار، مجمّعة من Flightradar24 وSkyscanner وTrip.com. قد تتغيّر — تأكد قبل السفر بـ 24 ساعة.","flights":{"XY672":{"al":"طيران ناس (flynas)","from":"RBA","to":"JED","dep":"21:35","arr":"06:45","next":1,"dur":"نحو 6 س 10 د","days":[3,6],"aircraft":"A330 / A320neo","terminal":"جدة: المبنى 1","note":"حسب جدول نونبر 2026: الأربعاء والسبت. وصل قبل الموعد في عدة رحلات."},"XY671":{"al":"طيران ناس (flynas)","from":"JED","to":"RBA","dep":"14:40","arr":"19:05","next":0,"dur":"نحو 6 س 25 د","days":[1,6],"aircraft":"A330 / A320neo","terminal":"جدة: المبنى 1","note":"حسب جدول نونبر 2026: غالباً الإثنين والسبت (المواعيد تغيّرت عدة مرات منذ الصيف)."},"XY664":{"al":"طيران ناس (flynas)","from":"CMN","to":"JED","dep":"20:10","arr":"04:35","next":1,"dur":"نحو 6 س 25 د","days":[],"note":"مواعيد صيف 2026 — تحقق."},"XY663":{"al":"طيران ناس (flynas)","from":"JED","to":"CMN","dep":"13:40","arr":"18:05","next":0,"dur":"نحو 6 س 25 د","days":[],"note":"مواعيد 2026 — تحقق."},"AT248":{"al":"الخطوط الملكية المغربية","from":"CMN","to":"JED","dep":"03:55","arr":"","next":0,"dur":"نحو 6 س","days":[],"note":"تحقق من الموعد في تطبيق RAM."},"AT249":{"al":"الخطوط الملكية المغربية","from":"JED","to":"CMN","dep":"15:10","arr":"20:10","next":0,"dur":"نحو 7 س","days":[],"note":"تحقق من الموعد."},"SV373":{"al":"الخطوط السعودية","from":"JED","to":"CMN","dep":"08:25","arr":"","next":0,"dur":"نحو 7 س","days":[],"note":"تحقق من الموعد."},"SV379":{"al":"الخطوط السعودية","from":"JED","to":"CMN","dep":"12:55","arr":"17:35","next":0,"dur":"نحو 6 س 40 د","days":[],"note":"تحقق من الموعد."}},"alerts":[]};
+let FLDB=S.get('flightsdb',null)||FL_SEED;
+function loadFlightsDB(){
+  if(!location.protocol.startsWith('http')) return;
+  fetch('flights.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+    if(!d||!d.flights) return; const ch=d.updated!==FLDB.updated; FLDB=d; S.set('flightsdb',d);
+    if(ch && flightChanges().length) toast('⚠️ تغيير في موعد رحلتك — افتح «خطتي»');
+    if(ch && (view==='home'||view==='travel')) render();
+  }).catch(()=>{});
+}
+const normNo=n=>String(n||'').toUpperCase().replace(/\s+/g,'');
+function lookupFlight(no){ return FLDB.flights[normNo(no)]||null; }
+const DAYN=['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+function nextDates(days,after,count){ const out=[]; if(!days||!days.length) return out;
+  const d=after?new Date(after+'T00:00:00'):new Date(); d.setHours(0,0,0,0); if(after) d.setDate(d.getDate()+1);
+  for(let i=0;i<120&&out.length<count;i++){ if(days.includes(d.getDay())) out.push(d.toISOString().slice(0,10)); d.setDate(d.getDate()+1); }
+  return out; }
+function flightChanges(){ const F=S.get('myFlights',{}), out=[];
+  ['out','ret'].forEach(k=>{ const f=F[k]||{}, db=lookupFlight(f.no); if(!db||!f.no) return;
+    if(f.dep && db.dep && f.dep!==db.dep) out.push({k,no:f.no,field:'الإقلاع',old:f.dep,nw:db.dep});
+    if(f.arr && db.arr && f.arr!==db.arr) out.push({k,no:f.no,field:'الوصول',old:f.arr,nw:db.arr});
+    if(f.date && db.days && db.days.length && !db.days.includes(new Date(f.date+'T00:00:00').getDay())) out.push({k,no:f.no,field:'اليوم',old:DAYN[new Date(f.date+'T00:00:00').getDay()],nw:db.days.map(x=>DAYN[x]).join(' / ')});
+  });
+  (FLDB.alerts||[]).forEach(a=>{ const nos=[normNo((F.out||{}).no),normNo((F.ret||{}).no)]; if(nos.includes(normNo(a.no))) out.push({k:'',no:a.no,field:'تنبيه',old:'',nw:a.text}); });
+  return out; }
+function statusLinks(no,date){ no=normNo(no); if(!no) return ''; const icao=no.replace(/^XY/,'KNE').replace(/^AT/,'RAM').replace(/^SV/,'SVA');
+  return `<div class="links">${L('https://www.google.com/search?q='+encodeURIComponent(no+' flight status'),'🔴 الحالة المباشرة (Google)','')}${L('https://www.flightradar24.com/data/flights/'+no.toLowerCase(),'Flightradar24')}${L('https://flightaware.com/live/flight/'+icao,'FlightAware')}${L(no.startsWith('XY')?'https://www.flynas.com/ar/manage-booking':no.startsWith('AT')?'https://www.royalairmaroc.com/ma-ar':'https://www.saudia.com/ar-ma','إدارة الحجز / تسجيل الوصول')}</div>`; }
+let flPick={out:null,ret:null};
+function vLookup(){
+  const F=S.get('myFlights',{out:{},ret:{}}), o=F.out||{}, r=F.ret||{};
+  const ch=flightChanges();
+  const card=(k,title,f,after)=>{ const db=lookupFlight(f.no), dates=db?nextDates(db.days,after||null,6):[];
+    return `<div class="card"><h2>${title}</h2>
+    <div class="row"><input id="lk_${k}" dir="ltr" placeholder="رقم الرحلة مثل XY672" value="${esc(f.no||'')}" style="flex:1;min-width:140px"><button class="btn sm" data-lk="${k}">🔎 بحث تلقائي</button></div>
+    ${f.no&&!db?`<p class="warn" style="margin-top:8px">لم أجد ${esc(f.no)} في قاعدة المواعيد بعد — أدخل البيانات يدوياً أسفله، وسيُبحث عنها في التحديث القادم.</p>`:''}
+    ${db?`<div style="margin-top:8px"><div class="prayer"><span>${esc(db.al)}</span><b dir="ltr">${normNo(f.no)}</b></div>
+      <div class="prayer"><span>🛫 ${db.from} — الإقلاع</span><b>${db.dep||'—'}</b></div>
+      <div class="prayer"><span>🛬 ${db.to} — الوصول ${db.next?'(اليوم التالي)':''}</span><b>${db.arr||'—'}</b></div>
+      <div class="prayer"><span>⏱️ المدة</span><span>${esc(db.dur||'')}</span></div>
+      ${db.days&&db.days.length?`<div class="prayer"><span>📅 أيام التشغيل</span><span>${db.days.map(x=>DAYN[x]).join('، ')}</span></div>`:''}
+      ${db.terminal?`<div class="prayer"><span>🏢 المبنى</span><span>${esc(db.terminal)}</span></div>`:''}
+      <p class="muted">${esc(db.note||'')}</p>
+      ${dates.length?`<label>اختر تاريخ رحلتك:</label><div class="row">${dates.map(d=>`<button class="btn sm ${f.date===d?'goldb':'light'}" data-ldate="${k}|${d}">${DAYN[new Date(d+'T00:00:00').getDay()]} ${d.split('-').reverse().slice(0,2).join('/')}</button>`).join('')}</div>`:''}
+      <label>أو أدخل التاريخ:</label><input type="date" data-ldate-in="${k}" value="${f.date||''}">
+      ${statusLinks(f.no,f.date)}</div>`:''}</div>`; };
+  return `${ch.length?`<div class="card" style="border:2px solid var(--red)"><h2 style="color:var(--red)">⚠️ تغييرات في رحلتك</h2>${ch.map(c=>`<div class="prayer"><span>${esc(c.no)} — ${c.field}</span><span>${c.old?esc(c.old)+' ← ':''}<b>${esc(c.nw)}</b></span></div>`).join('')}
+      <button class="btn sm" id="applyCh">✓ اعتماد المواعيد الجديدة</button> <span class="muted">آخر تحقق: ${FLDB.updated.split('-').reverse().join('/')}</span></div>`:''}
+  <div class="card hero"><h2>✈️ أدخل رقم الرحلة فقط</h2><p class="muted" style="margin:0">يجلب التطبيق تلقائياً المطارات والساعة وأيام التشغيل، ويراقب التغييرات مرتين في الأسبوع. آخر تحديث للمواعيد: <b>${FLDB.updated.split('-').reverse().join('/')}</b></p></div>
+  ${card('out','🛫 رحلة الذهاب',o)}
+  ${card('ret','🛬 رحلة الإياب',r,o.date)}
+  ${o.date&&r.date?`<div class="card"><p style="margin:0">📆 مدة الرحلة: <b>${Math.round((new Date(r.date)-new Date(o.date))/864e5)+1} يوماً</b> — من ${o.date.split('-').reverse().join('/')} إلى ${r.date.split('-').reverse().join('/')}</p>
+    <button class="btn goldb sm" id="buildPlan" style="margin-top:6px">🗓️ ابنِ البرنامج كاملاً على هذه الرحلة</button></div>`:''}
+  <p class="muted">${esc(FLDB.note)}</p>`;
+}
+function applyLookup(k,no){ const F=S.get('myFlights',{out:{},ret:{}}), db=lookupFlight(no); F[k]=F[k]||{}; F[k].no=normNo(no);
+  if(db){ Object.assign(F[k],{al:db.al,from:db.from,to:db.to,dep:db.dep,arr:db.arr,stop:'مباشر'}); }
+  S.set('myFlights',F); return db; }
+function buildFromFlights(){ const F=S.get('myFlights',{}), o=F.out||{}, r=F.ret||{}; if(!o.date) return false;
+  settings.start = (o.next||(lookupFlight(o.no)||{}).next) ? addDays(o.date,1) : o.date;
+  if(r.date) settings.days=Math.max(1,Math.round((new Date(r.date)-new Date(settings.start))/864e5)+1);
+  settings.order = o.to==='MED'?'medina':'mecca';
+  if(settings.days && settings.meccaDays>=settings.days) settings.meccaDays=Math.ceil(settings.days/2);
+  T.from=o.from||T.from; T.to=o.to||T.to; T.back=r.from||T.back; T.out=o.date; T.ret=r.date||T.ret;
+  saveSettings(); saveT(); return true; }
+
+/* ================== خطوات المطار ================== */
+const AIRPORT_STEPS=[
+  {t:'قبل السفر (24–48 ساعة)', ic:'📋', s:[
+    'تأكد من موعد الرحلة في «🔴 الحالة المباشرة» — قد يتغيّر الموعد.',
+    'سجّل الوصول (Check-in) عبر تطبيق أو موقع شركة الطيران عند فتحه.',
+    'جهّز: الجواز، التأشيرة، تذكرة الطيران، حجز الفندق، تصريح العمرة في نسك.',
+    'زن الحقائب حسب المسموح في تذكرتك (طيران ناس: الأمتعة حسب نوع التذكرة).',
+    'ضع الإحرام وأغراض الاغتسال في حقيبة اليد، لا في الحقيبة المشحونة.',
+    'اغتسل وتطيّب في البيت أو الفندق قبل الخروج (للرجل في البدن).']},
+  {t:'الخروج من أزرو ومطار المغادرة', ic:'🚗', s:[
+    'اخرج مبكراً — احسب الوقت في «من أزرو للمطار».',
+    'احضر للمطار قبل 3 ساعات من الإقلاع للرحلات الدولية.',
+    'توجّه إلى مكتب تسجيل شركة الطيران وسلّم الحقائب واحصل على بطاقة الصعود.',
+    'شرطة الحدود: الجواز وبطاقة الصعود (وقد تُطلب التأشيرة).',
+    'التفتيش الأمني: السوائل في حقيبة اليد بعبوات صغيرة.',
+    'انتظر عند البوابة المكتوبة على بطاقة الصعود، وتابع الشاشات.']},
+  {t:'في الطائرة — الميقات', ic:'✈️', s:[
+    'البس الإحرام قبل الإقلاع أو في الطائرة قبل الميقات.',
+    'عند إعلان الطاقم محاذاة الميقات: انوِ وقل «لبيك عمرة» وابدأ التلبية.',
+    'لا تؤخّر الإحرام إلى ما بعد الهبوط في جدة.',
+    'اشرب الماء ونَم قليلاً — ستبدأ المناسك بعد الوصول.']},
+  {t:'الوصول إلى مطار جدة', ic:'🛬', s:[
+    'اتبع لوحات «الجوازات / Passport Control».',
+    'الجوازات: الجواز والتأشيرة، وأخذ البصمة والصورة.',
+    'استلم الحقائب من السير المكتوب على الشاشة برقم رحلتك.',
+    'اشترِ شريحة الاتصال (أو انتظر للمراكز التجارية إن كان الطابور طويلاً).',
+    'لا تقبل عروض نقل من أشخاص مجهولين — استعمل القطار أو التاكسي الرسمي أو التطبيقات.']},
+  {t:'من مطار جدة إلى مكة', ic:'🚄', s:[
+    'قطار الحرمين: المحطة متصلة مباشرة بالمبنى 1، والرحلة إلى مكة نحو 45 دقيقة.',
+    'في مكة تنزل في محطة الرصيفة، ثم تحتاج تاكسي إلى الفندق.',
+    'أو تاكسي رسمي / Careem / Uber مباشرة إلى الفندق (نحو ساعة إلى ساعة ونصف حسب الزحام).',
+    'في الفندق: ضع الحقائب، توضأ، استرح قليلاً، ثم توجّه للحرم لأداء العمرة.']},
+  {t:'رحلة العودة من جدة', ic:'🏠', s:[
+    'تأكد من الموعد قبل 24 ساعة، وسجّل الوصول إلكترونياً.',
+    'اخرج من مكة مبكراً (القطار أو التاكسي) — احضر للمطار قبل 3–4 ساعات.',
+    'زمزم: يُشحن عادة في عبوة 5 لترات مختومة من المحلات المعتمدة — تحقق من شروط شركتك.',
+    'التمور والهدايا في الحقيبة المشحونة، والأدوية والوثائق في حقيبة اليد.',
+    'بعد الوصول إلى الرباط: الجوازات ثم الحقائب، ثم الطريق إلى أزرو. «آيبون تائبون عابدون لربنا حامدون».']}
+];
+function vAirport(){ const ok=S.get('apsteps',{}); let n=0,t=0;
+  const html=AIRPORT_STEPS.map((g,gi)=>`<div class="card"><h2>${g.ic} ${g.t}</h2>${g.s.map((x,i)=>{const k=gi+'_'+i; t++; if(ok[k]) n++;
+    return `<label class="check ${ok[k]?'ok':''}"><input type="checkbox" data-ap="${k}" ${ok[k]?'checked':''}><span>${esc(x)}</span></label>`;}).join('')}</div>`).join('');
+  return `<div class="card hero"><h2>🛂 خطوات المطار خطوة بخطوة</h2><p class="muted" style="margin:0">علِّم كل خطوة تنجزها — ${n} / ${t}</p></div>${html}
+  <div class="card"><button class="btn light sm" id="apReset">إعادة ضبط الخطوات</button></div>`; }
+
+/* ================== التطبيقات المفيدة للمعتمر ================== */
+const APPS=[
+  {c:'🕋 أساسية (حمّلها قبل السفر)', a:[
+    {n:'نسك — Nusuk',q:'Nusuk',d:'التطبيق الرسمي لوزارة الحج والعمرة: تصريح العمرة، حجز الروضة الشريفة، تذاكر قطار الحرمين، خرائط ومساعد ذكي. يعمل دون استهلاك الإنترنت.',must:true,url:'https://www.nusuk.sa/ar'},
+    {n:'قطار الحرمين — HHR Train',q:'Haramain High Speed Railway',d:'حجز تذاكر القطار بين جدة (والمطار) ومكة والمدينة، واختيار المقاعد والتذكرة الإلكترونية.',must:true,url:'https://sar.hhr.sa/'},
+    {n:'توكلنا — Tawakkalna',q:'Tawakkalna',d:'خدمات حكومية، ومنها شراء تذاكر حافلات المدينة المنورة.',url:'https://ta.sdaia.gov.sa/'},
+    {n:'تطبيق شركة الطيران (flynas)',q:'flynas',d:'تسجيل الوصول، بطاقة الصعود، ومتابعة تغييرات موعد رحلتك.',must:true,url:'https://www.flynas.com/ar'}]},
+  {c:'🚌 التنقل', a:[
+    {n:'حافلات مكة — Makkah Bus',q:'Makkah Bus',d:'الرسمي من الهيئة الملكية لمدينة مكة: 12 خطاً، تخطيط الرحلة، مواعيد الوصول المباشرة، وشراء التذاكر.',must:true},
+    {n:'حافلات المدينة — Madinah Bus',q:'Madinah Bus',d:'تذاكر الحافلات داخل المدينة المنورة ومساراتها.'},
+    {n:'Careem — كريم',q:'Careem',d:'سيارات أجرة عبر التطبيق في مكة والمدينة وجدة.',must:true},
+    {n:'Uber — أوبر',q:'Uber',d:'بديل لكريم، قارن السعر بينهما.'},
+    {n:'Jeeny — جيني',q:'Jeeny',d:'تطبيق نقل سعودي، أحياناً أرخص.'},
+    {n:'سابتكو — SAPTCO',q:'SAPTCO',d:'حافلات بين المدن بأسعار أقل من القطار.'}]},
+  {c:'🗺️ الخرائط والترجمة', a:[
+    {n:'خرائط Google',q:'Google Maps',d:'نزّل خرائط مكة والمدينة دون اتصال (Offline) قبل السفر، واحفظ موقع الفندق.',must:true},
+    {n:'ترجمة Google',q:'Google Translate',d:'ترجمة فورية بالكاميرا والصوت عند الحاجة.'}]},
+  {c:'📖 العبادة', a:[
+    {n:'مصحف المدينة النبوية',q:'مصحف المدينة النبوية',d:'تطبيق مجمع الملك فهد لطباعة المصحف الشريف.'},
+    {n:'Muslim Pro',q:'Muslim Pro',d:'مواقيت الصلاة والقبلة والقرآن والأذكار.'}]},
+  {c:'🍽️ الأكل والتسوق', a:[
+    {n:'هنقرستيشن — HungerStation',q:'HungerStation',d:'توصيل الطعام إلى الفندق.'},
+    {n:'جاهز — Jahez',q:'Jahez',d:'توصيل الطعام، بديل لهنقرستيشن.'}]},
+  {c:'📶 الاتصالات', a:[
+    {n:'mySTC',q:'mySTC',d:'إدارة شريحة STC وتجديد الباقة.'},
+    {n:'Mobily',q:'Mobily',d:'إدارة شريحة موبايلي والباقات.'},
+    {n:'ياقوت من زين — Yaqoot',q:'Yaqoot Zain',d:'شراء شريحة زين رقمياً وتوثيقها عبر أبشر.'}]},
+  {c:'🚑 الصحة والسلامة والمال', a:[
+    {n:'أسعفني — الهلال الأحمر السعودي',q:'Asefny',d:'طلب الإسعاف وتحديد موقعك تلقائياً.',must:true},
+    {n:'XE Currency',q:'XE Currency',d:'تحويل الريال إلى الدرهم بسرعة.'}]}
+];
+const EMERGENCY=[['الطوارئ الموحّد (مكة)','911'],['الإسعاف','997'],['الدفاع المدني','998'],['الشرطة','999'],['المرور','993']];
+function vApps(){ const got=S.get('appsGot',{}); let n=0,t=0;
+  const body=APPS.map(g=>`<div class="card"><h2>${g.c}</h2>${g.a.map(a=>{t++; if(got[a.n]) n++;
+    return `<div class="prayer" style="align-items:flex-start;gap:10px"><input type="checkbox" data-app="${esc(a.n)}" ${got[a.n]?'checked':''} style="width:22px;height:22px;flex:0 0 22px;accent-color:var(--green);margin-top:6px">
+      <div style="flex:1"><b>${esc(a.n)}</b> ${a.must?'<span class="pill gold">ضروري</span>':''}<div class="muted">${esc(a.d)}</div>
+      <div class="row" style="margin-top:4px">${L('https://play.google.com/store/search?q='+encodeURIComponent(a.q)+'&c=apps','⬇️ Google Play','')}${a.url?L(a.url,'الموقع'):''}</div></div></div>`;}).join('')}</div>`).join('');
+  return `<div class="card hero"><h2>📱 التطبيقات التي تحتاجها في العمرة</h2><p class="muted" style="margin:0">علِّم ما حمّلته — ${n} / ${t}. حمّل التطبيقات «الضرورية» في المغرب قبل السفر.</p>
+    <p class="warn" style="margin-top:8px">⚠️ حمّل التطبيقات من المتجر الرسمي فقط، وتأكد أن الناشر هو الجهة الرسمية (مثل وزارة الحج والعمرة لتطبيق نسك).</p></div>
+  ${body}
+  <div class="card"><h2>☎️ أرقام الطوارئ في السعودية</h2>${EMERGENCY.map(e=>`<div class="prayer"><span>${e[0]}</span><b dir="ltr">${e[1]}</b></div>`).join('')}
+  <p class="muted">سجّل أيضاً رقم الفندق ورقم القنصلية المغربية في جدة في هاتفك.</p></div>`; }
+
 /* ================== الواجهات ================== */
 let view='home', sub={adhkar:Object.keys(ADHKAR)[0], places:'mecca', more:'plan'};
 function render(){
@@ -847,7 +1004,9 @@ function vHome(){
   }
   const h=saudiNow().getHours()+saudiNow().getMinutes()/60;
   const nx=pt.filter(p=>p[0]!=='الشروق').find(p=>p[1]>h);
+  const chg=flightChanges();
   return `
+  ${chg.length?`<div class="card" style="border:2px solid var(--red)"><b style="color:var(--red)">⚠️ تغيير في موعد رحلتك ${esc(chg[0].no)}: ${chg[0].field} ${esc(chg[0].nw)}</b><br><button class="btn sm" data-go="travel" style="margin-top:6px">عرض التفاصيل</button></div>`:''}
   ${(d===null||d<1)?flightSummary():''}
   ${dayCard}
   <div class="card now-box"><h2>🧭 ماذا أفعل الآن؟</h2><p style="margin:0">${s.tip}</p>
@@ -865,6 +1024,8 @@ function vHome(){
     <button class="btn light" data-go="travel">✈️ الطيران والفنادق</button>
     <button class="btn light" data-go="more:plan">📅 برنامج الرحلة</button>
     <button class="btn light" data-go="more:telecom">📶 شرائح الإنترنت</button>
+    <button class="btn light" data-go="more:apps">📱 التطبيقات</button>
+    <button class="btn light" data-go="travel:airport">🛂 خطوات المطار</button>
   </div>`;
 }
 
@@ -922,9 +1083,10 @@ function vPlaces(){
 
 function vMore(){
   const t=sub.more;
-  const tabs=[['telecom','📶 الاتصالات'],['plan','📅 برنامج الرحلة'],['tips','⭐ نصائح ذهبية'],['maps','🗺️ الخرائط'],['tasbih','📿 السبحة'],['pack','🎒 التجهيز'],['notes','📝 مذكرات'],['settings','⚙️ الإعدادات']];
+  const tabs=[['apps','📱 التطبيقات'],['telecom','📶 الاتصالات'],['plan','📅 برنامج الرحلة'],['tips','⭐ نصائح ذهبية'],['maps','🗺️ الخرائط'],['tasbih','📿 السبحة'],['pack','🎒 التجهيز'],['notes','📝 مذكرات'],['settings','⚙️ الإعدادات']];
   let body='';
-  if(t==='telecom'){ body=vTelecom(); loadTelecom('silent'); }
+  if(t==='apps'){ body=vApps(); }
+  else if(t==='telecom'){ body=vTelecom(); loadTelecom('silent'); }
   else if(t==='plan'){ const plan=buildPlan(), d=tripDay();
     body=`<div class="card"><h2>برنامج ${AR(plan.length)} يوماً</h2><p class="muted">برنامج مقترح قابل للتعديل من الإعدادات (عدد الأيام وترتيب المدينتين).</p>
     ${plan.map((p,i)=>`<div class="day ${d===i+1?'today':''}"><b>اليوم ${AR(i+1)}${settings.start?' — '+dateOf(i):''}</b> <span class="pill">${p.city}</span><div>${esc(p.t)}</div><div class="muted">${esc(p.d)}</div></div>`).join('')}</div>`;
@@ -972,7 +1134,7 @@ function dateOf(i){ const d=new Date(settings.start+'T00:00:00'); d.setDate(d.ge
 /* ================== الأحداث ================== */
 function bind(){
   const on=(sel,ev,fn)=>document.querySelectorAll(sel).forEach(el=>el.addEventListener(ev,fn));
-  on('[data-go]','click',e=>{const [v,s]=e.currentTarget.dataset.go.split(':'); view=v; if(s) sub[v]=s; if(v==='adhkar') sub.q=''; render();});
+  on('[data-go]','click',e=>{const [v,s]=e.currentTarget.dataset.go.split(':'); view=v; if(s) sub[v]=s; if(v==='travel'&&s) travelTab=s; if(v==='travel'&&!s){travelTab='flights';flTab='lookup';} if(v==='adhkar') sub.q=''; render();});
   on('[data-city]','click',e=>{settings.city=e.currentTarget.dataset.city; saveSettings(); render();});
   on('#locBtn','click',locate);
   on('#qSave','click',()=>{const v=$('#qStart').value; if(v){settings.start=v; saveSettings(); render();}});
@@ -1012,6 +1174,14 @@ function bind(){
     F.ret=Object.assign(F.ret||{},{al:o.al.split(' (')[0],from:o.to,to:o.from,stop:o.direct?'مباشر':'توقف واحد'});
     S.set('myFlights',F); flTab='plan'; toast('أُضيف إلى خطتك — أكمل التواريخ والأوقات'); render();});
   on('#bSave','click',()=>{const B=S.get('budget',{}); document.querySelectorAll('[data-b]').forEach(el=>B[el.dataset.b]=el.value); S.set('budget',B); toast('تم الحفظ ✓'); render();});
+  on('[data-lk]','click',e=>{const k=e.currentTarget.dataset.lk, no=$('#lk_'+k).value.trim(); if(!no) return; const db=applyLookup(k,no); toast(db?'✓ وُجدت الرحلة '+normNo(no):'لم تُوجد — ستُضاف في التحديث القادم'); render();});
+  on('[data-ldate]','click',e=>{const [k,d]=e.currentTarget.dataset.ldate.split('|'); const F=S.get('myFlights',{out:{},ret:{}}); F[k]=F[k]||{}; F[k].date=d; S.set('myFlights',F); render();});
+  on('[data-ldate-in]','change',e=>{const k=e.currentTarget.dataset.ldateIn; const F=S.get('myFlights',{out:{},ret:{}}); F[k]=F[k]||{}; F[k].date=e.currentTarget.value; S.set('myFlights',F); render();});
+  on('#applyCh','click',()=>{const F=S.get('myFlights',{}); ['out','ret'].forEach(k=>{const f=F[k]||{},db=lookupFlight(f.no); if(db){f.dep=db.dep; f.arr=db.arr;}}); S.set('myFlights',F); toast('✓ اعتُمدت المواعيد الجديدة'); render();});
+  on('#buildPlan','click',()=>{ if(buildFromFlights()){ toast('✓ بُني البرنامج على رحلتك'); view='more'; sub.more='plan'; render(); } });
+  on('[data-ap]','change',e=>{const o=S.get('apsteps',{}); o[e.currentTarget.dataset.ap]=e.currentTarget.checked; S.set('apsteps',o); render();});
+  on('#apReset','click',()=>{S.set('apsteps',{}); render();});
+  on('[data-app]','change',e=>{const o=S.get('appsGot',{}); o[e.currentTarget.dataset.app]=e.currentTarget.checked; S.set('appsGot',o); render();});
   on('[data-op]','click',e=>{telOp=e.currentTarget.dataset.op; render();});
   on('#telRefresh','click',()=>{ toast('جارٍ جلب آخر العروض…'); telLoading=false; loadTelecom(); });
   on('[data-tt]','click',e=>{travelTab=e.currentTarget.dataset.tt; render();});
@@ -1043,7 +1213,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   }).catch(()=>{});
 }
 
-applyTrip(); hdr(); render(); setTimeout(()=>loadTelecom('silent'),3000);
+applyTrip(); hdr(); render(); setTimeout(()=>{loadTelecom('silent'); loadFlightsDB();},3000);
 setInterval(()=>{ if(view==='home' && !document.activeElement.matches('input,textarea,select')) render(); }, 60000);
 </script>
 </body>
