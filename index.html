@@ -770,6 +770,49 @@ function calcLeave(){
   el.innerHTML=`<div class="warn">🕰️ اخرج من أزرو قبل الساعة <b>${fmtT(t)}</b>${day}<br><span class="muted">الحضور للمطار قبل 3 ساعات + نحو ${AR(h)} ساعات طريق وهامش احتياط.</span></div>`;
 }
 
+
+/* ================== عروض الاتصالات والإنترنت بالسعودية ==================
+   المصدر: telecom.json في المستودع — يُحدَّث أسبوعياً تلقائياً، والتطبيق يجلب آخر نسخة */
+const TEL_SEED={"updated":"2026-11-19","currency":"ريال","note":"الأسعار بالريال السعودي كما نشرتها المصادر (غالباً شاملة ضريبة 15%). العروض تتغيّر، فتأكد عند الشراء.","operators":[{"id":"stc","name":"STC — باقات سوا زائر","color":"#4f008c","url":"https://www.stc.com.sa/","where":"منافذ STC في المطار والمراكز التجارية","notes":"التفعيل يتطلب زيارة فرع STC وتسجيل البصمة بالجواز.","packages":[{"name":"زائر 35","price":40.25,"data":"5 GB","gb":5,"min":"ساعة مكالمات","days":14},{"name":"زائر 52","price":60,"data":"20 GB","gb":20,"min":"ساعتان","days":14},{"name":"زائر 65","price":75,"data":"31 GB","gb":31,"min":"3 ساعات","days":21},{"name":"زائر 104","price":120,"data":"65 GB","gb":65,"min":"5 ساعات (تشمل المغرب)","days":28},{"name":"زائر 130","price":150,"data":"75 GB","gb":75,"min":"6 ساعات","days":28},{"name":"زائر 165","price":190,"data":"101 GB","gb":101,"min":"10 ساعات","days":28}]},{"id":"mobily","name":"موبايلي — باقات الزوار","color":"#00a6e1","url":"https://www.mobily.com.sa/","where":"منافذ موبايلي في المطار والمحلات المعتمدة","notes":"الدقائق «فليكس» محلية ودولية. باقات 100 و150 فيها تواصل اجتماعي بلا حدود.","packages":[{"name":"زائر 30","price":34.5,"data":"5 GB","gb":5,"min":"60 دقيقة","days":14},{"name":"زائر 50","price":57.5,"data":"20 GB","gb":20,"min":"120 دقيقة","days":14},{"name":"زائر 65","price":74.75,"data":"30 GB","gb":30,"min":"200 دقيقة","days":21},{"name":"زائر 90","price":103.5,"data":"55 GB","gb":55,"min":"300 دقيقة","days":30},{"name":"زائر 100","price":115,"data":"25 GB + تواصل بلا حدود","gb":25,"min":"400 دقيقة","days":14,"social":true},{"name":"زائر 150","price":172.5,"data":"40 GB + تواصل بلا حدود","gb":40,"min":"600 دقيقة","days":30,"social":true}]},{"id":"zain","name":"زين — باقات الزوار","color":"#2fb34a","url":"https://sa.zain.com/","where":"منافذ زين في المطارات والمتاجر، أو رقمياً عبر تطبيق «ياقوت» مع التوثيق بأبشر","notes":"الأسماء الرسمية للباقات قد تختلف في المنفذ.","packages":[{"name":"زائر 40","price":40,"data":"10 GB","gb":10,"min":"60 دقيقة","days":14},{"name":"زائر 60","price":60,"data":"20 GB","gb":20,"min":"150 دقيقة","days":14},{"name":"زائر 85","price":85,"data":"40 GB","gb":40,"min":"250 دقيقة","days":21},{"name":"زائر 120","price":120,"data":"75 GB","gb":75,"min":"350 دقيقة","days":28},{"name":"زائر 140","price":140,"data":"100 GB","gb":100,"min":"500 دقيقة","days":28}]},{"id":"salam","name":"سلام موبايل — باقات الزوار","color":"#e4572e","url":"https://salam.sa/","where":"المحلات المعتمدة","notes":"تعمل على شبكة زين.","packages":[{"name":"زائر 30","price":34.5,"data":"6 GB","gb":6,"min":"60 دقيقة","days":14},{"name":"زائر 52","price":59.8,"data":"25 GB","gb":25,"min":"120 دقيقة","days":14},{"name":"زائر 65","price":74.75,"data":"30 GB","gb":30,"min":"300 دقيقة","days":28},{"name":"زائر 112","price":129,"data":"55 GB","gb":55,"min":"600 دقيقة","days":45},{"name":"زائر 148","price":170,"data":"100 GB + تواصل بلا حدود","gb":100,"min":"500 دقيقة","days":28,"social":true}]}],"esim":[{"name":"شريحة eSIM دولية (مثال: Roafly)","price":"14.90 دولار","data":"5 GB","days":30,"note":"بيانات فقط بلا رقم سعودي، تُفعَّل قبل السفر"},{"name":"شريحة eSIM دولية (مثال: Roafly)","price":"24.90 دولار","data":"10 GB","days":30,"note":"تحتاج هاتفاً يدعم eSIM"}],"tips":["رحلتك 15 يوماً: باقات «أسبوعين» (14 يوماً) تنتهي قبل يوم العودة، فاختر باقة 21 يوماً أو أكثر، أو جدّد يوماً واحداً.","تحتاج الجواز والتأشيرة وتسجيل البصمة لشراء شريحة محلية. في موسم العمرة طوابير المطار طويلة، والمراكز التجارية أسرع.","شريحة واحدة بباقة كبيرة + مشاركة الإنترنت (Hotspot) مع زوجتك قد تكون أوفر من شريحتين.","احتفظ بشريحتك المغربية في الهاتف لاستقبال رسائل البنك، وفعّل الشريحة السعودية للإنترنت (هاتف بشريحتين أو eSIM).","أوقف التجوال الدولي (Roaming) لشريحتك المغربية قبل الإقلاع لتفادي فواتير مرتفعة."],"sources":[{"t":"KSA Expats — Visitor SIM Packages 2026","u":"https://ksaexpats.com/saudi-arabia-visitor-sim-packages/"},{"t":"Roafly — Saudi tourist SIM (15 أكتوبر 2026)","u":"https://www.roafly.com/blog/saudi-arabia-tourist-sim-card"},{"t":"Zain KSA — Yaqoot & Absher","u":"https://sa.zain.com/en/all-news/%E2%80%9Cyaqoot%E2%80%9D-%E2%80%9Czain-ksa%E2%80%9D-first-operator-service-enabling-visitor-sim-authentication-absher"}]};
+let TEL=S.get('telecom',null)||TEL_SEED, telLoading=false, telOp='all';
+function loadTelecom(force){
+  if(telLoading || !location.protocol.startsWith('http')) return;
+  telLoading=true;
+  fetch('telecom.json?t='+Date.now(),{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
+    telLoading=false; if(!d||!d.operators) return;
+    const changed = !TEL || d.updated!==TEL.updated;
+    TEL=d; S.set('telecom',d);
+    if(changed && force!=='silent'){ toast('📶 وصلت عروض اتصالات محدّثة'); }
+    if(view==='more' && sub.more==='telecom') render();
+  }).catch(()=>{telLoading=false;});
+}
+function vTelecom(){
+  const stay=+settings.days||15, all=[];
+  TEL.operators.forEach(o=>o.packages.forEach(p=>all.push(Object.assign({op:o},p))));
+  const fit=all.filter(p=>p.days>=stay).sort((a,b)=>a.price-b.price);
+  const cheapest=fit[0], best=fit.slice().sort((a,b)=>a.price/a.gb-b.price/b.gb)[0];
+  const ops=telOp==='all'?TEL.operators:TEL.operators.filter(o=>o.id===telOp);
+  const fmtD=d=>d.split('-').reverse().join('/');
+  const row=p=>`<div class="prayer" style="align-items:center;gap:8px;${p.days<stay?'opacity:.6':''}">
+     <div style="flex:1"><b>${esc(p.name)}</b> <span class="muted">· ${esc(p.data)} · ${esc(p.min)}</span><br><span class="muted">⏳ ${p.days} يوماً${p.days<stay?' — أقصر من رحلتك':''}${p.social?' · 💬 تواصل بلا حدود':''}</span></div>
+     <b style="white-space:nowrap">${p.price} ${TEL.currency}</b></div>`;
+  const rec=(p,t)=>p?`<div class="dua" style="font-size:16px"><b>${t}</b><br>${esc(p.op.name.split(' —')[0])} — ${esc(p.name)}: ${esc(p.data)}، ${esc(p.min)}، ${p.days} يوماً — <b>${p.price} ${TEL.currency}</b></div>`:'';
+  return `<div class="card hero"><h2>📶 الإنترنت والاتصالات في السعودية</h2>
+    <p class="muted" style="margin:0">آخر تحديث للعروض: <b>${fmtD(TEL.updated)}</b> · تتحدث تلقائياً كل أسبوع</p>
+    <button class="btn light sm" id="telRefresh" style="margin-top:6px">↻ جلب آخر العروض الآن</button></div>
+  <div class="card"><h2>🎯 الأنسب لرحلتك (${stay} يوماً)</h2>
+    ${rec(cheapest,'💰 الأرخص الذي يغطي رحلتك كاملة')}${best&&best!==cheapest?rec(best,'⚖️ أفضل قيمة (أرخص سعر للجيغا)'):''}
+    ${!fit.length?'<p class="warn">لا توجد باقة واحدة تغطي كل المدة؛ اختر باقة 28 يوماً أو جدّد.</p>':''}</div>
+  <div class="tabs"><button class="${telOp==='all'?'on':''}" data-op="all">الكل</button>${TEL.operators.map(o=>`<button class="${telOp===o.id?'on':''}" data-op="${o.id}">${esc(o.name.split(' —')[0])}</button>`).join('')}</div>
+  ${ops.map(o=>`<div class="card" style="border-top:4px solid ${o.color}"><h2>${esc(o.name)}</h2>
+    <p class="muted" style="margin:0 0 4px">📍 ${esc(o.where)}</p>${o.notes?`<p class="muted" style="margin:0 0 6px">ℹ️ ${esc(o.notes)}</p>`:''}
+    ${o.packages.slice().sort((a,b)=>a.price-b.price).map(row).join('')}
+    <div style="margin-top:8px">${L(o.url,'🌐 الموقع الرسمي','')}</div></div>`).join('')}
+  ${TEL.esim&&TEL.esim.length?`<div class="card"><h2>📲 بديل: شريحة eSIM قبل السفر</h2>${TEL.esim.map(e=>`<div class="prayer"><span><b>${esc(e.data)}</b> · ${e.days} يوماً<br><span class="muted">${esc(e.name)} — ${esc(e.note)}</span></span><b>${esc(e.price)}</b></div>`).join('')}</div>`:''}
+  <div class="card"><h3>💡 نصائح</h3><ul class="clean">${TEL.tips.map(t=>`<li>${esc(t)}</li>`).join('')}</ul><p class="muted">${esc(TEL.note)}</p>
+    <p class="muted" style="margin:0">المصادر: ${TEL.sources.map(x=>`<a href="${x.u}" target="_blank" rel="noopener">${esc(x.t)}</a>`).join(' · ')}</p></div>`;
+}
+
 /* ================== الواجهات ================== */
 let view='home', sub={adhkar:Object.keys(ADHKAR)[0], places:'mecca', more:'plan'};
 function render(){
@@ -821,6 +864,7 @@ function vHome(){
     <button class="btn light" data-go="more:maps">🗺️ الخرائط</button>
     <button class="btn light" data-go="travel">✈️ الطيران والفنادق</button>
     <button class="btn light" data-go="more:plan">📅 برنامج الرحلة</button>
+    <button class="btn light" data-go="more:telecom">📶 شرائح الإنترنت</button>
   </div>`;
 }
 
@@ -878,9 +922,10 @@ function vPlaces(){
 
 function vMore(){
   const t=sub.more;
-  const tabs=[['plan','📅 برنامج الرحلة'],['tips','⭐ نصائح ذهبية'],['maps','🗺️ الخرائط'],['tasbih','📿 السبحة'],['pack','🎒 التجهيز'],['notes','📝 مذكرات'],['settings','⚙️ الإعدادات']];
+  const tabs=[['telecom','📶 الاتصالات'],['plan','📅 برنامج الرحلة'],['tips','⭐ نصائح ذهبية'],['maps','🗺️ الخرائط'],['tasbih','📿 السبحة'],['pack','🎒 التجهيز'],['notes','📝 مذكرات'],['settings','⚙️ الإعدادات']];
   let body='';
-  if(t==='plan'){ const plan=buildPlan(), d=tripDay();
+  if(t==='telecom'){ body=vTelecom(); loadTelecom('silent'); }
+  else if(t==='plan'){ const plan=buildPlan(), d=tripDay();
     body=`<div class="card"><h2>برنامج ${AR(plan.length)} يوماً</h2><p class="muted">برنامج مقترح قابل للتعديل من الإعدادات (عدد الأيام وترتيب المدينتين).</p>
     ${plan.map((p,i)=>`<div class="day ${d===i+1?'today':''}"><b>اليوم ${AR(i+1)}${settings.start?' — '+dateOf(i):''}</b> <span class="pill">${p.city}</span><div>${esc(p.t)}</div><div class="muted">${esc(p.d)}</div></div>`).join('')}</div>`;
   } else if(t==='tips'){
@@ -967,6 +1012,8 @@ function bind(){
     F.ret=Object.assign(F.ret||{},{al:o.al.split(' (')[0],from:o.to,to:o.from,stop:o.direct?'مباشر':'توقف واحد'});
     S.set('myFlights',F); flTab='plan'; toast('أُضيف إلى خطتك — أكمل التواريخ والأوقات'); render();});
   on('#bSave','click',()=>{const B=S.get('budget',{}); document.querySelectorAll('[data-b]').forEach(el=>B[el.dataset.b]=el.value); S.set('budget',B); toast('تم الحفظ ✓'); render();});
+  on('[data-op]','click',e=>{telOp=e.currentTarget.dataset.op; render();});
+  on('#telRefresh','click',()=>{ toast('جارٍ جلب آخر العروض…'); telLoading=false; loadTelecom(); });
   on('[data-tt]','click',e=>{travelTab=e.currentTarget.dataset.tt; render();});
   on('#tFrom','change',e=>{T.from=e.currentTarget.value; saveT(); render();});
   on('#tTo','change',e=>{T.to=e.currentTarget.value; saveT(); render();});
@@ -996,7 +1043,7 @@ if('serviceWorker' in navigator && location.protocol.startsWith('http')){
   }).catch(()=>{});
 }
 
-applyTrip(); hdr(); render();
+applyTrip(); hdr(); render(); setTimeout(()=>loadTelecom('silent'),3000);
 setInterval(()=>{ if(view==='home' && !document.activeElement.matches('input,textarea,select')) render(); }, 60000);
 </script>
 </body>
