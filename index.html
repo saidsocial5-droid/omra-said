@@ -851,7 +851,7 @@ function vLookup(){
   const card=(k,title,f,after)=>{ const db=lookupFlight(f.no), dates=db?nextDates(db.days,after||null,6):[];
     return `<div class="card"><h2>${title}</h2>
     <div class="row"><input id="lk_${k}" dir="ltr" placeholder="رقم الرحلة مثل XY672" value="${esc(f.no||'')}" style="flex:1;min-width:140px"><button class="btn sm" data-lk="${k}">🔎 بحث تلقائي</button></div>
-    ${f.no&&!db?`<p class="warn" style="margin-top:8px">لم أجد ${esc(f.no)} في قاعدة المواعيد بعد — أدخل البيانات يدوياً أسفله، وسيُبحث عنها في التحديث القادم.</p>`:''}
+    ${f.no&&!db?`<p class="warn" style="margin-top:8px">لم أجد ${esc(f.no)} في قاعدة المواعيد بعد — أدخل بياناتها يدوياً في «خطتي»، أو اطلب إضافتها إلى قاعدة المواعيد لتُراقَب تلقائياً.</p>`:''}
     ${db?`<div style="margin-top:8px"><div class="prayer"><span>${esc(db.al)}</span><b dir="ltr">${normNo(f.no)}</b></div>
       <div class="prayer"><span>🛫 ${db.from} — الإقلاع</span><b>${db.dep||'—'}</b></div>
       <div class="prayer"><span>🛬 ${db.to} — الوصول ${db.next?'(اليوم التالي)':''}</span><b>${db.arr||'—'}</b></div>
@@ -1174,7 +1174,7 @@ function bind(){
     F.ret=Object.assign(F.ret||{},{al:o.al.split(' (')[0],from:o.to,to:o.from,stop:o.direct?'مباشر':'توقف واحد'});
     S.set('myFlights',F); flTab='plan'; toast('أُضيف إلى خطتك — أكمل التواريخ والأوقات'); render();});
   on('#bSave','click',()=>{const B=S.get('budget',{}); document.querySelectorAll('[data-b]').forEach(el=>B[el.dataset.b]=el.value); S.set('budget',B); toast('تم الحفظ ✓'); render();});
-  on('[data-lk]','click',e=>{const k=e.currentTarget.dataset.lk, no=$('#lk_'+k).value.trim(); if(!no) return; const db=applyLookup(k,no); toast(db?'✓ وُجدت الرحلة '+normNo(no):'لم تُوجد — ستُضاف في التحديث القادم'); render();});
+  on('[data-lk]','click',e=>{const k=e.currentTarget.dataset.lk, no=$('#lk_'+k).value.trim(); if(!no) return; const db=applyLookup(k,no); toast(db?'✓ وُجدت الرحلة '+normNo(no):'لم تُوجد في قاعدة المواعيد'); render();});
   on('[data-ldate]','click',e=>{const [k,d]=e.currentTarget.dataset.ldate.split('|'); const F=S.get('myFlights',{out:{},ret:{}}); F[k]=F[k]||{}; F[k].date=d; S.set('myFlights',F); render();});
   on('[data-ldate-in]','change',e=>{const k=e.currentTarget.dataset.ldateIn; const F=S.get('myFlights',{out:{},ret:{}}); F[k]=F[k]||{}; F[k].date=e.currentTarget.value; S.set('myFlights',F); render();});
   on('#applyCh','click',()=>{const F=S.get('myFlights',{}); ['out','ret'].forEach(k=>{const f=F[k]||{},db=lookupFlight(f.no); if(db){f.dep=db.dep; f.arr=db.arr;}}); S.set('myFlights',F); toast('✓ اعتُمدت المواعيد الجديدة'); render();});
